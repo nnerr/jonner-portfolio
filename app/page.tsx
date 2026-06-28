@@ -571,7 +571,7 @@ export default function PortfolioPage() {
                         className="relative h-28 w-28 overflow-hidden rounded-xl border border-amber-300/30 bg-amber-400/10 shadow-inner shadow-black/30 transition-all duration-300 hover:border-amber-300/60 hover:shadow-[0_0_25px_rgba(251,191,36,0.25)] sm:h-32 sm:w-32 md:h-36 md:w-36 xl:h-40 xl:w-40"
                       >
                         <Image
-                          src="/profile.jpg"
+                          src="/profile.jpeg"
                           alt="Jonner D. Villapando"
                           fill
                           className="object-cover"
