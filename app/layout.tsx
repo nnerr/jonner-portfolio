@@ -1,47 +1,64 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Fraunces, IM_Fell_English_SC, Literata } from "next/font/google";
+import { SITE_URL, profile } from "@/lib/content";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-sans",
+// Engraved small caps for map labels, kickers and the legend.
+const fell = IM_Fell_English_SC({
+  weight: "400",
   subsets: ["latin"],
+  variable: "--font-fell",
   display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-geist-mono",
+// Headings and the name.
+const fraunces = Fraunces({
   subsets: ["latin"],
+  variable: "--font-fraunces",
+  axes: ["SOFT", "WONK", "opsz"],
   display: "swap",
 });
+
+// Body text.
+const literata = Literata({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  variable: "--font-literata",
+  axes: ["opsz"],
+  display: "swap",
+});
+
+const description =
+  "Software developer from Manila. Explore a map of my work: a Ruby on Rails internship, SmishX (an SMS phishing detector), and the teams I've led.";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Jonner Villapando — Software Developer",
-    template: "%s | Jonner Villapando",
+    default: `${profile.shortName} · ${profile.role}`,
+    template: `%s · ${profile.shortName}`,
   },
-  description:
-    "Portfolio of Jonner D. Villapando — Computer Science graduate from FEU Institute of Technology with Ruby on Rails, Next.js, and machine learning experience.",
+  description,
   keywords: [
     "Jonner Villapando",
     "software developer",
     "full stack developer",
     "Ruby on Rails",
     "Next.js",
+    "machine learning",
     "portfolio",
   ],
-  authors: [{ name: "Jonner D. Villapando" }],
+  authors: [{ name: profile.name }],
   openGraph: {
-    title: "Jonner Villapando — Software Developer",
-    description:
-      "Computer Science graduate building practical software. Ruby on Rails, Next.js, and applied machine learning.",
+    title: `${profile.shortName} · ${profile.role}`,
+    description,
     type: "website",
     locale: "en_US",
+    url: "/",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Jonner Villapando — Software Developer",
-    description:
-      "Computer Science graduate building practical software. Ruby on Rails, Next.js, and applied machine learning.",
+    title: `${profile.shortName} · ${profile.role}`,
+    description,
   },
 };
 
@@ -53,9 +70,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${fell.variable} ${fraunces.variable} ${literata.variable} antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-svh">{children}</body>
     </html>
   );
 }

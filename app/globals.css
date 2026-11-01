@@ -2,27 +2,24 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+/* ------------------------------------------------------------------------ */
+/* Tokens                                                                    */
+/* ------------------------------------------------------------------------ */
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-sea: var(--sea);
+  --color-seal: var(--seal);
+  --font-sans: var(--font-literata);
+  --font-serif: var(--font-literata);
+  --font-display: var(--font-fraunces);
+  --font-heading: var(--font-fraunces);
+  --font-label: var(--font-fell);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -43,88 +40,829 @@
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --paper: #f3ead7;
+  --paper-deep: #e8dbbf;
+  --paper-edge: #d9c59b;
+  --ink: #2b2118;
+  --ink-soft: #5c4d3c;
+  --ink-faint: #8a7860; /* decorative lines only, never body text */
+  --sea: #a9bfb8;
+  --sea-deep: #86a29a;
+  --seal: #a3271f;
+  --seal-deep: #741a14;
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--paper-deep);
+  --card-foreground: var(--ink);
+  --popover: var(--paper);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper);
+  --secondary: var(--paper-deep);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-deep);
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--paper-deep);
+  --accent-foreground: var(--ink);
+  --destructive: var(--seal);
+  --border: color-mix(in oklab, var(--ink) 22%, transparent);
+  --input: color-mix(in oklab, var(--ink) 30%, transparent);
+  --ring: var(--seal);
+  --radius: 0.25rem;
+
+  /* Paper textures: fine grain and soft blotches, both as tiny inline SVGs. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .17 0 0 0 0 .13 0 0 0 0 .09 0 0 0 .7 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='.13'/%3E%3C/svg%3E");
+  --blotch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='720' height='720'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.006' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .33 0 0 0 0 .16 0 0 0 1.1 -.45'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23b)' opacity='.16'/%3E%3C/svg%3E");
+  --halo:
+    0 0 1px var(--paper), 0 0 2px var(--paper), 0 0 3px var(--paper),
+    0 0 6px var(--paper), 0 0 10px var(--paper);
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
+/* ------------------------------------------------------------------------ */
+/* Base                                                                      */
+/* ------------------------------------------------------------------------ */
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
+    @apply border-border;
   }
   html {
-    @apply font-sans;
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
   }
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-literata), Georgia, serif;
+    text-rendering: optimizeLegibility;
+  }
+  /* Grain and an edge vignette sit behind everything. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      radial-gradient(ellipse 120% 90% at 50% 45%, transparent 55%, rgb(92 77 60 / 0.16) 100%),
+      var(--grain), var(--blotch);
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--seal) 24%, transparent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--seal);
+    outline-offset: 3px;
+  }
+  kbd {
+    font-family: var(--font-fell), Georgia, serif;
+    font-size: 0.8em;
+    line-height: 1;
+    padding: 0.18em 0.4em 0.22em;
+    border: 1px solid var(--ink-soft);
+    border-bottom-width: 2px;
+    border-radius: 3px;
+    color: var(--ink-soft);
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/* Shared pieces                                                             */
+/* ------------------------------------------------------------------------ */
+
+@layer components {
+  .font-fell {
+    font-family: var(--font-fell), Georgia, serif;
+    letter-spacing: 0.01em;
+  }
+  .font-display {
+    font-family: var(--font-fraunces), Georgia, serif;
+    font-optical-sizing: auto;
+    font-variation-settings: "SOFT" 40, "WONK" 0;
+  }
+
+  .btn-ink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 1rem;
+    font-family: var(--font-fell), Georgia, serif;
+    font-size: 1.02rem;
+    line-height: 1;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    box-shadow: inset 0 0 0 3px var(--paper), inset 0 0 0 4px var(--ink);
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 0.18s, color 0.18s, box-shadow 0.18s;
+  }
+  .btn-ink:hover {
+    background: var(--ink);
+    color: var(--paper);
+    box-shadow: inset 0 0 0 3px var(--ink), inset 0 0 0 4px var(--paper);
+  }
+  .btn-ink:hover kbd {
+    color: var(--paper);
+    border-color: var(--paper);
+  }
+
+  .link-seal {
+    color: var(--seal);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    transition: text-decoration-thickness 0.15s;
+  }
+  .link-seal:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  /* A hairline with a small diamond in the middle. */
+  .rule-ornament {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--ink-faint);
+  }
+  .rule-ornament::before,
+  .rule-ornament::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+  }
+
+  .diamond-list {
+    list-style: none;
+    padding: 0;
+  }
+  .diamond-list > li {
+    position: relative;
+    padding-left: 1.15rem;
+  }
+  .diamond-list > li::before {
+    content: "";
+    position: absolute;
+    left: 0.15rem;
+    top: 0.62em;
+    width: 0.38rem;
+    height: 0.38rem;
+    transform: rotate(45deg);
+    background: var(--ink-soft);
+  }
+
+  /* Tools shown as ink stamps rather than pills. */
+  .stamp {
+    display: inline-block;
+    padding: 0.28rem 0.55rem 0.32rem;
+    font-family: var(--font-fell), Georgia, serif;
+    font-size: 0.92rem;
+    line-height: 1;
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+    box-shadow: inset 0 0 0 2px var(--paper-deep), inset 0 0 0 2.75px color-mix(in oklab, var(--ink) 55%, transparent);
+    background: var(--paper-deep);
+  }
+  .stamp:nth-child(3n + 1) {
+    transform: rotate(-1.2deg);
+  }
+  .stamp:nth-child(3n + 2) {
+    transform: rotate(0.8deg);
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/* The atlas (home page)                                                     */
+/* ------------------------------------------------------------------------ */
+
+.atlas {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  overflow-x: clip;
+}
+
+.atlas-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  padding: 1rem 1rem 0.75rem;
+}
+
+.atlas-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.portrait {
+  position: relative;
+  flex: none;
+  width: 4.25rem;
+  height: 5.25rem;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1.5px solid var(--ink);
+  box-shadow: 0 0 0 3px var(--paper), 0 0 0 4px var(--ink);
+  background: var(--paper-deep);
+}
+.portrait img {
+  filter: grayscale(1) sepia(0.55) contrast(1.05) brightness(1.02);
+  mix-blend-mode: multiply;
+}
+
+.atlas-stage {
+  position: relative;
+}
+
+.atlas-scroller {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-faint) transparent;
+  padding: 0 1rem 0.5rem;
+}
+
+.map-sheet {
+  position: relative;
+  width: max(760px, 100%);
+  aspect-ratio: 16 / 10;
+  margin-inline: auto;
+  transform-origin: 0 0;
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  background-color: var(--paper);
+  background-image: var(--grain), var(--blotch);
+  box-shadow: 0 1px 0 var(--paper-edge), 0 22px 40px -28px rgb(43 33 24 / 0.55);
+}
+.map-sheet > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Trail draws itself once, on first paint. */
+.trail-reveal {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: trail-draw 2.6s cubic-bezier(0.45, 0, 0.25, 1) 0.35s forwards;
+}
+@keyframes trail-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Fog of war -------------------------------------------------------------- */
+.fog-layer,
+.places-layer,
+.uncharted-layer {
+  position: absolute;
+  inset: 0;
+}
+.fog-layer {
+  pointer-events: none;
+}
+.fog {
+  position: absolute;
+  width: 15%;
+  aspect-ratio: 1.6;
+  transform: translate(-50%, -66%);
+}
+/* Fog is a game layer: it rolls in once the page is interactive, and never
+   hides anything from visitors without JavaScript. */
+.atlas:not([data-js]) .fog:not(.fog--uncharted) {
+  opacity: 0;
+}
+.atlas[data-js] .fog {
+  transition: opacity 1.4s ease, transform 1.6s ease;
+}
+.fog svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.fog[data-cleared] {
+  opacity: 0;
+  transform: translate(-50%, -66%) scale(1.25);
+}
+.fog--uncharted {
+  width: 19%;
+  transform: translate(-50%, -50%);
+}
+
+.uncharted-layer {
+  pointer-events: none;
+}
+.uncharted-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: var(--halo);
+}
+
+/* Places ------------------------------------------------------------------ */
+.places-layer {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.place-item {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+.place {
+  --seal-size: 30px;
+  --pad: 6px;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: var(--pad);
+  color: var(--ink);
+  text-decoration: none;
+  border-radius: 6px;
+  -webkit-tap-highlight-color: transparent;
+}
+.place[data-kind="main"] {
+  --seal-size: 34px;
+}
+.place[data-kind="side"] {
+  --seal-size: 26px;
+}
+.place[data-kind="inn"] {
+  --seal-size: 32px;
+}
+.place[data-label="below"] {
+  flex-direction: column;
+  transform: translate(-50%, calc(-0.5 * var(--seal-size) - var(--pad)));
+}
+.place[data-label="above"] {
+  flex-direction: column-reverse;
+  transform: translate(-50%, calc(-100% + 0.5 * var(--seal-size) + var(--pad)));
+}
+.place[data-label="right"] {
+  flex-direction: row;
+  gap: 0.55rem;
+  transform: translate(calc(-0.5 * var(--seal-size) - var(--pad)), -50%);
+}
+.place[data-label="left"] {
+  flex-direction: row-reverse;
+  gap: 0.55rem;
+  transform: translate(calc(-100% + 0.5 * var(--seal-size) + var(--pad)), -50%);
+}
+.place:focus-visible {
+  outline-offset: 0;
+}
+
+.seal-wrap {
+  position: relative;
+  flex: none;
+  width: var(--seal-size);
+  height: var(--seal-size);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+/* Bigger invisible hit area around every seal (at least 44px). */
+.seal-wrap::before {
+  content: "";
+  position: absolute;
+  inset: calc((var(--seal-size) - 52px) / 2);
+  border-radius: 50%;
+}
+.seal-wrap svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 1.5px 1px rgb(43 33 24 / 0.35));
+}
+.place:hover .seal-wrap,
+.place:focus-visible .seal-wrap {
+  transform: scale(1.1) rotate(-5deg);
+}
+.place[aria-current] .seal-wrap {
+  transform: scale(1.12);
+}
+.place[aria-current] .seal-wrap::after {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--seal);
+  animation: seal-spin 14s linear infinite;
+}
+@keyframes seal-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.place-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-shadow: var(--halo);
+}
+.place[data-label="right"] .place-text {
+  align-items: flex-start;
+  text-align: left;
+}
+.place[data-label="left"] .place-text {
+  align-items: flex-end;
+  text-align: right;
+}
+.place-name {
+  font-family: var(--font-fell), Georgia, serif;
+  font-size: 1.08rem;
+  line-height: 1.15;
+  white-space: nowrap;
+  background-image: linear-gradient(var(--ink), var(--ink));
+  background-repeat: no-repeat;
+  background-position: 50% 100%;
+  background-size: 0% 1.5px;
+  padding-bottom: 1px;
+  transition: background-size 0.35s ease;
+}
+.place[data-label="right"] .place-name {
+  background-position: 0 100%;
+}
+.place:hover .place-name,
+.place:focus-visible .place-name,
+.place[aria-current] .place-name {
+  background-size: 100% 1.5px;
+}
+.place-sub {
+  margin-top: 0.1rem;
+  max-width: 10.5rem;
+  font-size: 0.76rem;
+  font-style: italic;
+  line-height: 1.25;
+  color: var(--ink-soft);
+}
+.place-here {
+  font-family: var(--font-fell), Georgia, serif;
+  font-size: 0.82rem;
+  line-height: 1;
+  color: var(--seal);
+}
+
+/* Region panels ----------------------------------------------------------- */
+.region-panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  max-height: 84svh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background-color: var(--paper-deep);
+  background-image: var(--grain);
+  border-top: 1.5px solid var(--ink);
+  box-shadow: inset 0 3px 0 var(--paper-deep), inset 0 4px 0 var(--ink), 0 -18px 40px -20px rgb(43 33 24 / 0.5);
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0.35s;
+}
+.atlas:not([data-js]) .region-panel:target,
+.atlas[data-js] .region-panel[data-open] {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition-delay: 0s;
+}
+/* Browsers focus the panel itself on deep links (it scrolls). Its border
+   already marks it, so skip the outline; controls inside keep theirs. */
+.region-panel:focus {
+  outline: none;
+}
+.region-panel__inner {
+  padding: 1.25rem 1.25rem 2rem;
+}
+
+.panel-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgb(43 33 24 / 0.32);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.25s ease, visibility 0s linear 0.25s;
+}
+.atlas[data-panel] .panel-backdrop {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+/* Fast travel ------------------------------------------------------------- */
+.fast-travel {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: stop;
+}
+.fast-travel a {
+  display: grid;
+  grid-template-columns: 1.75rem 1fr;
+  align-items: center;
+  gap: 0.15rem 0.75rem;
+  padding: 0.6rem 0.5rem;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 16%, transparent);
+}
+.fast-travel li:last-child a {
+  border-bottom: 0;
+}
+.fast-travel a:hover {
+  background: color-mix(in oklab, var(--ink) 6%, transparent);
+}
+.fast-travel .ft-seal {
+  grid-row: span 2;
+  width: 1.6rem;
+  height: 1.6rem;
+}
+.fast-travel .ft-name {
+  font-family: var(--font-fell), Georgia, serif;
+  font-size: 1.08rem;
+  line-height: 1.1;
+}
+.fast-travel .ft-sub {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+.popover {
+  position: relative;
+}
+.popover > summary {
+  list-style: none;
+}
+.popover > summary::-webkit-details-marker {
+  display: none;
+}
+.popover-card {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.5rem);
+  z-index: 60;
+  width: 21rem;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--paper);
+  background-image: var(--grain);
+  border: 1.5px solid var(--ink);
+  box-shadow: inset 0 0 0 3px var(--paper), inset 0 0 0 4px var(--ink), 0 18px 36px -18px rgb(43 33 24 / 0.5);
+}
+
+/* Discovery toast: the "area name" card games show when you arrive. */
+.discovery {
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  z-index: 30;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  max-width: calc(100% - 1rem);
+  padding: 1.6rem clamp(1.5rem, 9vw, 5.5rem);
+  pointer-events: none;
+  text-shadow: var(--halo);
+  background: radial-gradient(closest-side, rgb(243 234 215 / 0.97) 62%, rgb(243 234 215 / 0) 100%);
+  animation: discovery 4.2s ease forwards;
+}
+.discovery__rule {
+  width: 16rem;
+  max-width: 60vw;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--ink), transparent);
+}
+@keyframes discovery {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+    letter-spacing: 0.02em;
+  }
+  14% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+    letter-spacing: 0.06em;
+  }
+}
+
+/* Footer bar -------------------------------------------------------------- */
+.atlas-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding: 0.75rem 1rem 1rem;
+  font-size: 0.9rem;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 1.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-fell), Georgia, serif;
+  color: var(--ink-soft);
+}
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.legend svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: none;
+}
+
+/* Desktop: the atlas fills the viewport and the panel docks on the right. */
+@media (min-width: 1024px) {
+  .atlas {
+    height: 100svh;
+    min-height: 640px;
+  }
+  .atlas-header {
+    flex-wrap: nowrap;
+    padding: 1rem 1.5rem 0.5rem;
+  }
+  .atlas-stage {
+    flex: 1;
+    min-height: 0;
+    /* clip, not hidden: a hidden box can still be scrolled by focus or
+       hash navigation, which would shift the map. */
+    overflow: clip;
+    container-type: size;
+  }
+  .atlas-scroller {
+    height: 100%;
+    overflow: visible;
+    padding: 0;
+    display: grid;
+    place-items: center;
+  }
+  .map-sheet {
+    width: min(100cqw - 3rem, (100cqh - 1.25rem) * 1.6);
+  }
+  .region-panel {
+    position: absolute;
+    left: auto;
+    top: 0.75rem;
+    right: 1.25rem;
+    bottom: 0.75rem;
+    width: min(440px, 42%);
+    max-height: none;
+    border: 1.5px solid var(--ink);
+    box-shadow: inset 0 0 0 3px var(--paper-deep), inset 0 0 0 4px var(--ink), 0 24px 48px -24px rgb(43 33 24 / 0.55);
+    transform: translateX(28px);
+  }
+  .region-panel__inner {
+    padding: 1.75rem 1.75rem 2.25rem;
+  }
+  .panel-backdrop {
+    display: none;
+  }
+  .atlas-footer {
+    flex-wrap: nowrap;
+    padding: 0.5rem 1.5rem 0.9rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  .place-sub {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-sheet,
+  .fog,
+  .region-panel,
+  .panel-backdrop,
+  .seal-wrap,
+  .place-name {
+    transition: none !important;
+  }
+  .trail-reveal {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .discovery {
+    animation: discovery-still 4.2s step-end forwards;
+  }
+  .place[aria-current] .seal-wrap::after {
+    animation: none;
+  }
+}
+@keyframes discovery-still {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/* Quest pages                                                               */
+/* ------------------------------------------------------------------------ */
+
+.checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.checklist > li {
+  position: relative;
+  padding-left: 2.1rem;
+}
+.checklist > li > svg {
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.stat-value {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 30, "WONK" 0;
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.pipeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.9rem;
+  counter-reset: step;
+}
+.pipeline > li {
+  position: relative;
+  counter-increment: step;
+  padding: 0.85rem 1rem 0.95rem 3.1rem;
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  box-shadow: inset 0 0 0 3px var(--paper), inset 0 0 0 3.75px color-mix(in oklab, var(--ink) 45%, transparent);
+}
+.pipeline > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0.85rem;
+  top: 0.8rem;
+  width: 1.55rem;
+  height: 1.55rem;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--paper);
+  background: var(--seal);
+  border-radius: 50%;
+}
+.pipeline > li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 1.6rem;
+  bottom: calc(-0.9rem - 1.5px);
+  width: 1.5px;
+  height: 0.9rem;
+  background: var(--ink);
 }
