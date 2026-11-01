@@ -3,7 +3,9 @@ import {
   along,
   blob,
   contours,
+  crossings,
   roughen,
+  sampleSpline,
   scatter,
   smoothPath,
   type Pt,
@@ -11,6 +13,10 @@ import {
 
 // The static artwork of the atlas. Rendered on the server only; the
 // interactive pins, labels and fog are drawn on top by <Atlas>.
+//
+// Elements with an `anim-*` class move gently (see "Living map" in
+// globals.css). Each animated element sits in its own group without a
+// transform attribute, because a CSS transform would replace it.
 
 const W = MAP_WIDTH;
 const H = MAP_HEIGHT;
@@ -91,6 +97,31 @@ const ROADS: Pt[][] = [
 const RIVER: Pt[] = [
   [585, 282], [614, 338], [590, 398], [616, 462], [596, 528], [610, 584],
   [574, 646], [528, 708], [508, 760], [492, 822], [482, 912],
+];
+
+// Second leg of the journey: from the internship to the current, sealed work.
+const SPUR: Pt[] = [at["cybersoft-citadel"], [800, 590], [848, 554], at["sealed-commission"]];
+
+// Bridges go wherever a trail or road crosses the river, so they follow the
+// routes if those ever change.
+const RIVER_LINE = sampleSpline(RIVER);
+const BRIDGES = [TRAIL, SPUR, ...ROADS].flatMap((route) => crossings(sampleSpline(route), RIVER_LINE));
+
+const LAKE = smoothPath(blob(700, 418, 46, { n: 10, wobble: 0.14, squash: 0.52, seed: 41 }));
+const LAKE_INNER = smoothPath(blob(704, 420, 30, { n: 9, wobble: 0.16, squash: 0.45, seed: 42 }));
+
+const FIELDS: { d: string; fill: string }[] = [
+  { d: "M1178 532L1222 520L1234 554L1190 566Z", fill: "#dccf9f" },
+  { d: "M1192 574L1236 562L1246 594L1202 606Z", fill: "#cfc394" },
+  { d: "M1160 590L1188 584L1198 616L1170 622Z", fill: "#e2d6a8" },
+];
+
+const MARSH_TUFTS: Pt[] = [
+  [236, 712], [252, 722], [270, 708], [288, 720], [304, 710], [262, 734], [282, 738], [246, 742],
+];
+
+const WAVES: Pt[] = [
+  [95, 330], [88, 690], [470, 82], [1000, 72], [1520, 380], [1180, 905], [1450, 892], [720, 950],
 ];
 
 const WAYSTONES = [0.38, 0.55, 0.72].map((t) => along(WORKSHOP_ROAD, t));
@@ -178,7 +209,7 @@ function University({ x, y }: { x: number; y: number }) {
       <path d="M3 -55v52M6 -55v52" stroke={INK} strokeWidth={1} opacity={0.35} />
       <path d="M-12 -58L0 -80L12 -58Z" fill={PAPER_DEEP} {...stroke} />
       <path d="M0 -80V-96" {...stroke} />
-      <path d="M0 -96l13 4.5l-13 4.5z" fill={SEAL} {...stroke} strokeWidth={1.1} />
+      <path className="anim-flag" d="M0 -96l13 4.5l-13 4.5z" fill={SEAL} {...stroke} strokeWidth={1.1} />
       <circle cy={-45} r={4.5} fill={PAPER} {...stroke} strokeWidth={1.2} />
       <path d="M0 -45v-2.6M0 -45h2" {...stroke} strokeWidth={1} />
       <path d="M-4 0v-8a4 4 0 0 1 8 0v8z" fill={INK} />
@@ -191,8 +222,15 @@ function GuildHall({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x} ${y - 26})`}>
       <path d="M-50 0v-58M50 0v-58" {...stroke} />
-      <path d="M-50 -57h13v17l-6.5 -4.5l-6.5 4.5z" fill={SEAL} {...stroke} strokeWidth={1.1} />
-      <path d="M50 -57h13v17l-6.5 -4.5l-6.5 4.5z" fill={INK_SOFT} {...stroke} strokeWidth={1.1} />
+      <path className="anim-flag" d="M-50 -57h13v17l-6.5 -4.5l-6.5 4.5z" fill={SEAL} {...stroke} strokeWidth={1.1} />
+      <path
+        className="anim-flag"
+        style={{ animationDelay: "-1.1s" }}
+        d="M50 -57h13v17l-6.5 -4.5l-6.5 4.5z"
+        fill={INK_SOFT}
+        {...stroke}
+        strokeWidth={1.1}
+      />
       <rect x={-36} y={-24} width={72} height={24} fill={PAPER} {...stroke} />
       <path d="M-42 -24L0 -50L42 -24Z" fill={PAPER_DEEP} {...stroke} />
       <path d="M-30 -24L0 -42.5" stroke={INK} strokeWidth={1} opacity={0.3} />
@@ -207,8 +245,10 @@ function GuildHall({ x, y }: { x: number; y: number }) {
 function Lighthouse({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x} ${y - 24})`}>
-      <path d="M-40 -61L-9 -61M-36 -72L-9 -63M-36 -50L-9 -59" stroke={LAMP} strokeWidth={2} opacity={0.9} />
-      <path d="M40 -61L9 -61M36 -72L9 -63M36 -50L9 -59" stroke={LAMP} strokeWidth={2} opacity={0.9} />
+      {/* The beam turns slowly around the lamp. */}
+      <g transform="translate(0 -61)">
+        <path className="anim-beam" d="M0 0L96 -18L96 18ZM0 0L-96 -18L-96 18Z" fill="url(#beam-glow)" />
+      </g>
       <path d="M-24 0q4 -9 13 -8q6 -9 14 -2q9 -6 15 3q8 1 6 7z" fill={PAPER_DEEP} {...stroke} />
       <path d="M-10 -1L-6 -52H6L10 -1Z" fill={PAPER} {...stroke} />
       <path d="M-8.6 -16L-7.9 -26H7.9L8.6 -16Z" fill={SEAL} />
@@ -234,9 +274,11 @@ function Signpost({ x, y }: { x: number; y: number }) {
   );
 }
 
-function Jeepney({ x, y }: { x: number; y: number }) {
+// Drawn at the origin facing left; the "anim-jeepney" group drives it along
+// the trail between Routa Crossroads and Cybersoft Citadel.
+function JeepneyBody() {
   return (
-    <g transform={`translate(${x} ${y})`}>
+    <g>
       <rect x={-22} y={-23} width={44} height={3} fill={INK} />
       <path d="M-19 -20v8M19 -20v8" {...stroke} strokeWidth={1.2} />
       <path d="M-20 -13h40v9h-40zM-20 -10h-8v6h8" fill={PAPER} {...stroke} strokeWidth={1.3} />
@@ -253,7 +295,14 @@ function Castle({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x} ${y - 26})`}>
       <path d="M0 -60V-76" {...stroke} />
-      <path d="M0 -76l14 4.5l-14 4.5z" fill={SEAL} {...stroke} strokeWidth={1.1} />
+      <path
+        className="anim-flag"
+        style={{ animationDelay: "-0.6s" }}
+        d="M0 -76l14 4.5l-14 4.5z"
+        fill={SEAL}
+        {...stroke}
+        strokeWidth={1.1}
+      />
       <rect x={-12} y={-55} width={24} height={30} fill={PAPER} {...stroke} />
       <path d={crenels(-12, -55, 24, 3)} fill="none" {...stroke} strokeWidth={1.3} />
       <path d="M-2 -46v7M2 -46v7" {...stroke} strokeWidth={1.2} />
@@ -288,6 +337,7 @@ function Workshop({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x} ${y - 26})`}>
       <path
+        className="anim-smoke"
         d="M11 -40c-7 -5 6 -9 0 -15c-6 -6 7 -9 1 -15"
         fill="none"
         stroke={INK_FAINT}
@@ -312,6 +362,8 @@ function Inn({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x} ${y - 26})`}>
       <path
+        className="anim-smoke"
+        style={{ animationDelay: "-2.2s" }}
         d="M-14 -50c-6 -5 6 -9 0 -14c-6 -5 6 -9 0 -14"
         fill="none"
         stroke={INK_FAINT}
@@ -383,13 +435,15 @@ function SeaMonster({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x} ${y})`}>
       <path d="M-68 4q10 -4 20 0t20 0M-12 4q10 -4 20 0t20 0M40 4q10 -4 20 0" fill="none" stroke={INK} strokeWidth={1} opacity={0.5} />
-      <path d="M-58 0c-6 -20 4 -36 18 -34c11 2 10 15 2 20c-5 4 -8 9 -6 14z" fill={SEA_DEEP} {...stroke} />
-      <circle cx={-41} cy={-27} r={1.8} fill={INK} />
-      <path d="M-34 -27l9 -4M-35 -24l9 1" {...stroke} strokeWidth={1} />
-      <path d="M-46 -34l-2 -8l5 5l1 -9l4 9" fill="none" {...stroke} strokeWidth={1.1} />
-      <path d="M-22 0q11 -30 24 0z" fill={SEA_DEEP} {...stroke} />
-      <path d="M10 0q10 -24 21 0z" fill={SEA_DEEP} {...stroke} />
-      <path d="M38 0q8 -4 12 -16q3 -9 -5 -9q-6 1 -3 6" fill="none" {...stroke} />
+      <g className="anim-bob anim-bob--slow">
+        <path d="M-58 0c-6 -20 4 -36 18 -34c11 2 10 15 2 20c-5 4 -8 9 -6 14z" fill={SEA_DEEP} {...stroke} />
+        <circle cx={-41} cy={-27} r={1.8} fill={INK} />
+        <path d="M-34 -27l9 -4M-35 -24l9 1" {...stroke} strokeWidth={1} />
+        <path d="M-46 -34l-2 -8l5 5l1 -9l4 9" fill="none" {...stroke} strokeWidth={1.1} />
+        <path d="M-22 0q11 -30 24 0z" fill={SEA_DEEP} {...stroke} />
+        <path d="M10 0q10 -24 21 0z" fill={SEA_DEEP} {...stroke} />
+        <path d="M38 0q8 -4 12 -16q3 -9 -5 -9q-6 1 -3 6" fill="none" {...stroke} />
+      </g>
       <text x={-6} y={30} textAnchor="middle" fontSize={16} fontStyle="italic" fill={INK_SOFT} style={body}>
         here be phishers
       </text>
@@ -400,11 +454,119 @@ function SeaMonster({ x, y }: { x: number; y: number }) {
 function Ship({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x} ${y}) rotate(-8)`}>
-      <path d="M-16 0h32l-6 8h-20z" fill={PAPER_DEEP} {...stroke} strokeWidth={1.3} />
-      <path d="M0 0v-28" {...stroke} strokeWidth={1.3} />
-      <path d="M1 -26q12 8 1 22z" fill={PAPER} {...stroke} strokeWidth={1.2} />
-      <path d="M-1 -24q-10 8 -1 20z" fill={PAPER} {...stroke} strokeWidth={1.2} />
-      <path d="M0 -28l7 2.5l-7 2.5" fill={SEAL} stroke="none" />
+      <g className="anim-bob">
+        <path d="M-16 0h32l-6 8h-20z" fill={PAPER_DEEP} {...stroke} strokeWidth={1.3} />
+        <path d="M0 0v-28" {...stroke} strokeWidth={1.3} />
+        <path d="M1 -26q12 8 1 22z" fill={PAPER} {...stroke} strokeWidth={1.2} />
+        <path d="M-1 -24q-10 8 -1 20z" fill={PAPER} {...stroke} strokeWidth={1.2} />
+        <path d="M0 -28l7 2.5l-7 2.5" fill={SEAL} stroke="none" />
+      </g>
+    </g>
+  );
+}
+
+function Bridge({ x, y, angle }: { x: number; y: number; angle: number }) {
+  return (
+    <g transform={`translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${angle.toFixed(1)})`}>
+      <rect x={-15} y={-4.5} width={30} height={9} fill={PAPER} />
+      <path d="M-15 -4.5h30M-15 4.5h30" stroke={INK} strokeWidth={1.6} strokeLinecap="round" />
+      <path d="M-9 -4.5v9M-3 -4.5v9M3 -4.5v9M9 -4.5v9" stroke={INK} strokeWidth={0.7} opacity={0.5} />
+    </g>
+  );
+}
+
+function Windmill({ x, y }: { x: number; y: number }) {
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      <path d="M-6 0L-3.5 -24H3.5L6 0Z" fill={PAPER} {...stroke} strokeWidth={1.3} />
+      <path d="M-5 -24L0 -30L5 -24Z" fill={PAPER_DEEP} {...stroke} strokeWidth={1.2} />
+      <path d="M-1.6 0v-5h3.2v5" fill={INK} />
+      <g transform="translate(0 -26)">
+        <g className="anim-spin">
+          {[0, 90, 180, 270].map((deg) => (
+            <path
+              key={deg}
+              d="M-1.6 -2L-1.6 -16L3.4 -16L3.4 -2Z"
+              transform={`rotate(${deg})`}
+              fill={PAPER}
+              stroke={INK}
+              strokeWidth={1}
+            />
+          ))}
+          <circle r={2} fill={INK} />
+        </g>
+      </g>
+    </g>
+  );
+}
+
+// The freelance work under NDA: a scroll tied with a red ribbon, seal unbroken.
+function SealedScroll({ x, y }: { x: number; y: number }) {
+  return (
+    <g transform={`translate(${x} ${y - 30}) rotate(-6)`}>
+      <rect x={-30} y={-26} width={60} height={26} fill={PAPER} {...stroke} />
+      <ellipse cx={-30} cy={-13} rx={5} ry={14} fill={PAPER_DEEP} {...stroke} />
+      <ellipse cx={30} cy={-13} rx={5} ry={14} fill={PAPER_DEEP} {...stroke} />
+      <path d="M-22 -19h22M-22 -13h26M-22 -7h17" stroke={INK} strokeWidth={1} opacity={0.4} />
+      <path d="M12 -26v26" stroke={SEAL} strokeWidth={4} />
+      <path d="M12 -1l-5 12M12 -1l5 12" stroke={SEAL} strokeWidth={2.6} strokeLinecap="round" />
+      <circle cx={12} cy={-13} r={7.5} fill={SEAL} stroke="var(--seal-deep)" strokeWidth={1.2} />
+      <circle cx={12} cy={-13} r={4.4} fill="none" stroke="var(--seal-deep)" strokeWidth={1} />
+    </g>
+  );
+}
+
+// Small italic place names, with a paper halo so they read over terrain.
+function AreaLabel({
+  x,
+  y,
+  anchor = "middle",
+  children,
+}: {
+  x: number;
+  y: number;
+  anchor?: "start" | "middle" | "end";
+  children: string;
+}) {
+  return (
+    <text
+      x={x}
+      y={y}
+      textAnchor={anchor}
+      fontSize={17}
+      fontStyle="italic"
+      fill={INK_SOFT}
+      stroke={PAPER}
+      strokeWidth={4}
+      strokeLinejoin="round"
+      paintOrder="stroke"
+      style={body}
+    >
+      {children}
+    </text>
+  );
+}
+
+function Birds() {
+  return (
+    <g className="anim-birds">
+      {[
+        [430, 82],
+        [458, 66],
+        [478, 92],
+      ].map(([x, y], i) => (
+        <g key={i} transform={`translate(${x} ${y})`}>
+          <path
+            className="anim-wings"
+            style={{ animationDelay: `${-i * 0.23}s` }}
+            d="M-9 0q4.5 -5 9 0q4.5 -5 9 0"
+            fill="none"
+            stroke={INK}
+            strokeWidth={1.3}
+            strokeLinecap="round"
+          />
+        </g>
+      ))}
     </g>
   );
 }
@@ -462,6 +624,8 @@ function ScaleBar({ x, y }: { x: number; y: number }) {
 
 export function MapArt() {
   const trail = smoothPath(TRAIL, false);
+  const spur = smoothPath(SPUR, false);
+  const river = smoothPath(RIVER, false);
 
   return (
     <svg
@@ -489,7 +653,24 @@ export function MapArt() {
             strokeWidth={18}
             strokeLinecap="round"
           />
+          <path
+            className="trail-reveal trail-reveal--late"
+            d={spur}
+            pathLength={1}
+            fill="none"
+            stroke="#fff"
+            strokeWidth={18}
+            strokeLinecap="round"
+          />
         </mask>
+        <radialGradient id="beam-glow">
+          <stop offset="0" stopColor="#f2d48a" stopOpacity={0.75} />
+          <stop offset="1" stopColor="#f2d48a" stopOpacity={0} />
+        </radialGradient>
+        <pattern id="furrows" width={6} height={6} patternUnits="userSpaceOnUse" patternTransform="rotate(28)">
+          <path d="M0 3h6" stroke={INK} strokeWidth={0.7} opacity={0.4} />
+        </pattern>
+        <path id="river-line" d={river} fill="none" />
         {/* Used by the fog patches drawn in <Atlas>. */}
         <filter id="fog-cloud" x="-30%" y="-30%" width="160%" height="160%">
           <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves={3} seed={3} result="noise" />
@@ -514,6 +695,18 @@ export function MapArt() {
           </g>
         ))}
       </g>
+      {WAVES.map(([x, y], i) => (
+        <path
+          key={`w${x}`}
+          className="anim-wave"
+          style={{ animationDelay: `${-i * 0.9}s` }}
+          d={`M${x} ${y}q5 -4 10 0t10 0`}
+          fill="none"
+          stroke={INK}
+          strokeWidth={1}
+          strokeLinecap="round"
+        />
+      ))}
 
       {/* Land: transparent, so the paper texture of the sheet shows through. */}
       <g clipPath="url(#land-clip)">
@@ -524,8 +717,22 @@ export function MapArt() {
         {contours(578, 220, [18, 36, 56], { squash: 0.62, seed: 9, rot: -0.2 }).map((d, i) => (
           <path key={`b${i}`} d={d} fill="none" stroke={INK_FAINT} strokeWidth={1} opacity={0.7} />
         ))}
-        <path d={smoothPath(RIVER, false)} fill="none" stroke={INK} strokeWidth={6.5} strokeLinecap="round" />
-        <path d={smoothPath(RIVER, false)} fill="none" stroke={SEA} strokeWidth={4} strokeLinecap="round" />
+        <path d={river} fill="none" stroke={INK} strokeWidth={6.5} strokeLinecap="round" />
+        <path d={river} fill="none" stroke={SEA} strokeWidth={4} strokeLinecap="round" />
+        <path d={LAKE} fill={SEA} stroke={INK} strokeWidth={1.4} />
+        <path d={LAKE_INNER} fill="none" stroke={SEA_DEEP} strokeWidth={1} opacity={0.8} />
+        {FIELDS.map((field) => (
+          <g key={field.d}>
+            <path d={field.d} fill={field.fill} stroke={INK} strokeWidth={0.9} strokeLinejoin="round" />
+            <path d={field.d} fill="url(#furrows)" />
+          </g>
+        ))}
+        {MARSH_TUFTS.map(([x, y]) => (
+          <g key={`${x}-${y}`} fill="none" stroke={INK} strokeWidth={1} strokeLinecap="round">
+            <path d={`M${x - 7} ${y + 3}h5M${x + 3} ${y + 3}h5`} stroke={SEA_DEEP} strokeWidth={1.6} />
+            <path d={`M${x} ${y}l-3 -7M${x} ${y}v-9M${x} ${y}l3 -7`} />
+          </g>
+        ))}
       </g>
       <path d={LAND} fill="none" stroke={INK} strokeWidth={2.2} strokeLinejoin="round" />
 
@@ -547,29 +754,51 @@ export function MapArt() {
       {WAYSTONES.map(([x, y]) => (
         <Waystone key={`${x.toFixed(0)}-${y.toFixed(0)}`} x={x} y={y} />
       ))}
+      {BRIDGES.map(({ point: [x, y], angle }) => (
+        <Bridge key={`${x.toFixed(0)}-${y.toFixed(0)}`} x={x} y={y} angle={angle} />
+      ))}
 
       {/* The journey, drawn in red like a route on an old chart. */}
-      <g mask="url(#trail-mask)">
-        <path
-          d={trail}
-          fill="none"
-          stroke={SEAL}
-          strokeWidth={2.8}
-          strokeDasharray="10 8"
-          strokeLinecap="round"
-          opacity={0.9}
-        />
+      <g mask="url(#trail-mask)" fill="none" stroke={SEAL} strokeWidth={2.8} strokeDasharray="10 8" strokeLinecap="round" opacity={0.9}>
+        <path d={trail} />
+        <path d={spur} />
       </g>
+
+      {/* Area names */}
+      <AreaLabel x={232} y={350}>Mount Deadline</AreaLabel>
+      <AreaLabel x={238} y={530}>Legacy Woods</AreaLabel>
+      <AreaLabel x={700} y={466}>Lake Localhost</AreaLabel>
+      <AreaLabel x={268} y={760}>Merge Conflict Marsh</AreaLabel>
+      <AreaLabel x={1018} y={806} anchor="start">Sprint Grove</AreaLabel>
+      <text
+        fontSize={16}
+        fontStyle="italic"
+        fill={INK_SOFT}
+        stroke={PAPER}
+        strokeWidth={4}
+        strokeLinejoin="round"
+        paintOrder="stroke"
+        dy={-9}
+        style={body}
+      >
+        <textPath href="#river-line" startOffset="17%">
+          River Refactor
+        </textPath>
+      </text>
 
       {/* Landmarks */}
       <University x={at["feu-highlands"][0]} y={at["feu-highlands"][1]} />
       <GuildHall x={at["guild-hall"][0]} y={at["guild-hall"][1]} />
       <Lighthouse x={at["phishing-coast"][0]} y={at["phishing-coast"][1]} />
+      <Windmill x={1198} y={644} />
       <Signpost x={at["routa-crossroads"][0]} y={at["routa-crossroads"][1]} />
-      <Jeepney x={1140} y={612} />
       <Castle x={at["cybersoft-citadel"][0]} y={at["cybersoft-citadel"][1]} />
+      <SealedScroll x={at["sealed-commission"][0]} y={at["sealed-commission"][1]} />
       <Workshop x={at["tinkers-workshop"][0]} y={at["tinkers-workshop"][1]} />
       <Inn x={at["wayfarers-inn"][0]} y={at["wayfarers-inn"][1]} />
+      <g className="anim-jeepney">
+        <JeepneyBody />
+      </g>
 
       {/* Sea furniture */}
       <path
@@ -581,6 +810,7 @@ export function MapArt() {
       />
       <Ship x={1336} y={268} />
       <SeaMonster x={1428} y={478} />
+      <Birds />
       <Compass x={1478} y={690} />
       <text
         x={1350}

@@ -2,7 +2,8 @@ import type { PlaceKind } from "@/lib/content";
 import { blob, smoothPath } from "./geometry";
 
 // Map markers. Quests are red wax seals, landmarks are ink medallions and the
-// inn is a red star. "!" means not yet visited; a tick means visited.
+// inn is a red star. "!" means not yet visited; a tick means visited. The
+// sealed commission shows a keyhole until it has been opened once.
 
 const WAX = smoothPath(blob(0, 0, 17.5, { n: 12, wobble: 0.07, seed: 4 }));
 
@@ -87,7 +88,15 @@ export function Seal({
         strokeLinecap="round"
         opacity={0.35}
       />
-      <Glyph visited={visited} color="var(--paper)" />
+      {kind === "sealed" && !visited ? (
+        // A keyhole: this place stays locked under NDA.
+        <g fill="var(--paper)">
+          <circle cy={-3} r={4.2} />
+          <path d="M-2.4 -1.2H2.4L4 8.5H-4Z" />
+        </g>
+      ) : (
+        <Glyph visited={visited} color="var(--paper)" />
+      )}
     </svg>
   );
 }

@@ -8,6 +8,8 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { MAP_HEIGHT, MAP_WIDTH, type Place } from "@/lib/content";
 import { DiscoveryToast } from "./DiscoveryToast";
 import { FastTravel } from "./FastTravel";
@@ -109,6 +111,7 @@ export function Atlas({
   region,
   children,
 }: Props) {
+  const router = useRouter();
   const hash = useHash();
   const visited = useVisited();
   const hydrated = useHydrated();
@@ -239,7 +242,7 @@ export function Atlas({
     [active],
   );
 
-  // Keyboard: Esc closes, M toggles fast travel.
+  // Keyboard: Esc closes, M toggles fast travel, C opens the character sheet.
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
@@ -258,11 +261,14 @@ export function Atlas({
         event.preventDefault();
         focusTravelRef.current = !travelOpen;
         setTravelOpen(!travelOpen);
+      } else if (event.key === "c" || event.key === "C") {
+        event.preventDefault();
+        router.push("/character");
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [active, close, desktop, travelOpen]);
+  }, [active, close, desktop, router, travelOpen]);
 
   // Desktop pan and zoom: bring the open place to the middle of the free space
   // left of the panel.
@@ -295,6 +301,9 @@ export function Atlas({
       <header className="atlas-header">
         {header}
         <div className="atlas-actions">
+          <Link href="/character" className="btn-ink">
+            Character <kbd className="hidden lg:inline">C</kbd>
+          </Link>
           <details
             ref={travelRef}
             className="popover hidden lg:block"
@@ -397,7 +406,7 @@ export function Atlas({
           <a
             href={`#${innSlug}`}
             onClick={(event) => open(innSlug, event)}
-            className="group order-first inline-flex items-center gap-2.5 no-underline lg:order-none"
+            className="group order-first inline-flex items-center gap-2.5 no-underline lg:order-0"
           >
             <Seal kind="inn" className="h-6 w-6 flex-none" />
             <span className="leading-tight">

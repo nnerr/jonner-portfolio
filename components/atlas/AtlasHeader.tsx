@@ -1,10 +1,11 @@
 import Image from "next/image";
+import Link from "next/link";
 import { profile } from "@/lib/content";
 
 export function AtlasHeader() {
   return (
     <div className="flex min-w-0 items-center gap-4">
-      <div className="portrait">
+      <Link href="/character" className="portrait portrait--link" aria-label="Open the character sheet">
         <Image
           src={profile.photo}
           alt={`Portrait of ${profile.name}`}
@@ -13,7 +14,7 @@ export function AtlasHeader() {
           className="object-cover"
           priority
         />
-      </div>
+      </Link>
       <div className="min-w-0">
         <h1 className="font-display text-[1.85rem] leading-[1.02] font-semibold tracking-[-0.015em] sm:text-[2.15rem]">
           {profile.name}

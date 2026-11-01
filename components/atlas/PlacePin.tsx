@@ -28,6 +28,7 @@ export function PlacePin({
         data-kind={place.kind}
         data-label={place.label}
         aria-current={active ? "location" : undefined}
+        aria-describedby={`peek-${place.slug}`}
         onClick={(event) => onOpen(place.slug, event)}
       >
         <span className="seal-wrap">
@@ -40,6 +41,14 @@ export function PlacePin({
           <span className="sr-only">{visited ? ", explored" : ", not explored yet"}</span>
         </span>
       </a>
+      {/* A quick look before clicking: shown on hover and keyboard focus. */}
+      <span id={`peek-${place.slug}`} role="tooltip" className="place-peek">
+        {place.peek.map((fact) => (
+          <span key={fact} className="block">
+            {fact}
+          </span>
+        ))}
+      </span>
     </li>
   );
 }

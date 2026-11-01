@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   certifications,
+  commission,
   education,
   getQuest,
   leadership,
@@ -19,7 +20,9 @@ function BeginQuest({ slug }: { slug: string }) {
 
 function StatRow({ stats }: { stats: { value: string; label: string }[] }) {
   return (
-    <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 border-y border-ink/20 py-4">
+    <dl
+      className={`mt-5 grid gap-x-4 gap-y-3 border-y border-ink/20 py-4 ${stats.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}
+    >
       {stats.map((stat) => (
         <div key={stat.label} className="flex flex-col-reverse">
           <dt className="mt-1 text-[0.92rem] italic text-ink-soft">{stat.label}</dt>
@@ -125,6 +128,20 @@ export function PlaceDetails({ slug }: { slug: string }) {
 
     case "routa-crossroads":
       return <QuestSummary slug="routa" />;
+
+    case "sealed-commission":
+      return (
+        <>
+          <p className="font-display text-[1.3rem] leading-snug font-semibold">{commission.role}</p>
+          <p className="text-ink-soft">{commission.since} to now</p>
+          <p className="mt-4">
+            I&rsquo;m working as a freelance full-stack engineer. The client and the work are under
+            an NDA, so this scroll stays sealed for now.
+          </p>
+          <StatRow stats={[commission.stat]} />
+          <p className="mt-4 italic text-ink-soft">The seal breaks when the NDA allows.</p>
+        </>
+      );
 
     case "tinkers-workshop":
       return (

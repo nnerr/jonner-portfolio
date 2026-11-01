@@ -136,6 +136,61 @@ export function scatter(
   return out.sort((a, b) => a[1] - b[1]);
 }
 
+/** Points along the same spline smoothPath draws, for measuring and crossing tests. */
+export function sampleSpline(points: Pt[], closed = false, steps = 16): Pt[] {
+  const n = points.length;
+  const at = (i: number) =>
+    closed ? points[(i + n) % n] : points[Math.max(0, Math.min(n - 1, i))];
+  const out: Pt[] = [];
+  const segments = closed ? n : n - 1;
+  for (let i = 0; i < segments; i++) {
+    const p0 = at(i - 1);
+    const p1 = at(i);
+    const p2 = at(i + 1);
+    const p3 = at(i + 2);
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    for (let s = 0; s < steps; s++) {
+      const t = s / steps;
+      const u = 1 - t;
+      const a = u * u * u;
+      const b = 3 * u * u * t;
+      const c = 3 * u * t * t;
+      const d = t * t * t;
+      out.push([
+        a * p1[0] + b * c1[0] + c * c2[0] + d * p2[0],
+        a * p1[1] + b * c1[1] + c * c2[1] + d * p2[1],
+      ]);
+    }
+  }
+  out.push(closed ? points[0] : points[n - 1]);
+  return out;
+}
+
+/** Where polyline `road` crosses polyline `river`, with the road's heading in degrees. */
+export function crossings(road: Pt[], river: Pt[]): { point: Pt; angle: number }[] {
+  const hits: { point: Pt; angle: number }[] = [];
+  for (let i = 1; i < road.length; i++) {
+    const [ax, ay] = road[i - 1];
+    const [bx, by] = road[i];
+    for (let j = 1; j < river.length; j++) {
+      const [cx, cy] = river[j - 1];
+      const [dx, dy] = river[j];
+      const den = (bx - ax) * (dy - cy) - (by - ay) * (dx - cx);
+      if (den === 0) continue;
+      const t = ((cx - ax) * (dy - cy) - (cy - ay) * (dx - cx)) / den;
+      const u = ((cx - ax) * (by - ay) - (cy - ay) * (bx - ax)) / den;
+      if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+        hits.push({
+          point: [ax + (bx - ax) * t, ay + (by - ay) * t],
+          angle: (Math.atan2(by - ay, bx - ax) * 180) / Math.PI,
+        });
+      }
+    }
+  }
+  return hits;
+}
+
 /** Point at fraction t along a polyline (by length). */
 export function along(points: Pt[], t: number): Pt {
   const lens: number[] = [];

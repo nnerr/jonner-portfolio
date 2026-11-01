@@ -16,6 +16,10 @@ export function Legend() {
         Landmark
       </li>
       <li>
+        <Seal kind="sealed" />
+        Sealed (under NDA)
+      </li>
+      <li>
         <WaystoneIcon />
         Waystone (certification)
       </li>

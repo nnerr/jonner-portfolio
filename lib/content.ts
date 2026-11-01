@@ -168,7 +168,7 @@ export const quests: Quest[] = [
     tools: ["Ruby on Rails", "CoffeeScript", "JavaScript", "Docker", "GitLab CI/CD"],
     lore: [
       "SafeboxIQ is a mortgage and loan processing platform. It automates document handling, income analysis and integration with loan origination systems, so lenders can prepare, validate and manage loan documents in one place.",
-      "I joined as an intern and worked tickets across the backend and the frontend of a large production codebase.",
+      "I joined as an intern and worked real tickets across the backend and the frontend of a large production codebase. Everything I built was merged into production.",
     ],
     objectives: [
       "Built a PDF generation flow for Exception Forms. It runs when a loan decision is Approved, Conditionally Approved or Counter Offered, and carries the decision data through the loan exception workflow.",
@@ -182,10 +182,7 @@ export const quests: Quest[] = [
       "Most tickets touched both sides of the stack. The bank account validation, for example, needed a check in the Rails backend and an inline error in the form.",
       "Every change went through a merge request and code review, then shipped through Docker and GitLab CI/CD.",
     ],
-    stats: [
-      { value: "40+", label: "merged merge requests" },
-      { value: "6", label: "months on the team" },
-    ],
+    stats: [{ value: "40+", label: "merge requests merged into production" }],
     rewards: [
       "Learned how a real engineering team reviews, tests and ships code.",
     ],
@@ -224,7 +221,8 @@ export const quests: Quest[] = [
       { value: "99.29%", label: "recall" },
       { value: "99.39%", label: "F1 score" },
     ],
-    statsNote: "Measured on the 20% of the dataset held out for testing (4,000 URLs).",
+    statsNote:
+      "Measured on the 3,887 URLs held out for testing: 1,915 legitimate and 1,972 phishing.",
     rewards: [
       "50 testers, from computer science students to CS/IT professionals and everyday internet users, rated the app “Strongly agree” in all five ISO 25010 categories we surveyed: effectiveness, performance, reliability, usability and security.",
       "IT officers at the Department of Information and Communications Technology (DICT) reviewed and validated the system.",
@@ -273,7 +271,7 @@ export function getQuest(slug: string) {
 // the keyboard tab order.
 // ---------------------------------------------------------------------------
 
-export type PlaceKind = "main" | "side" | "landmark" | "inn";
+export type PlaceKind = "main" | "side" | "landmark" | "inn" | "sealed";
 
 export type Place = {
   slug: string;
@@ -285,7 +283,11 @@ export type Place = {
   y: number;
   label: "below" | "above" | "left" | "right";
   quest?: string;
+  // Two or three short facts shown when hovering the place on the map.
+  peek: string[];
 };
+
+const skillCount = skillGroups.reduce((total, group) => total + group.items.length, 0);
 
 export const places: Place[] = [
   {
@@ -297,6 +299,7 @@ export const places: Place[] = [
     x: 420,
     y: 300,
     label: "below",
+    peek: ["BS Computer Science, software engineering", "Top Performing Student, AY 2021–2022", "3 certifications"],
   },
   {
     slug: "guild-hall",
@@ -307,6 +310,7 @@ export const places: Place[] = [
     x: 840,
     y: 240,
     label: "below",
+    peek: ["4 leadership roles", "ACM, Itamaraws Esports, CS Expo, Kode Kombat"],
   },
   {
     slug: "phishing-coast",
@@ -316,8 +320,9 @@ export const places: Place[] = [
     kindLabel: "Main quest",
     x: 1215,
     y: 390,
-    label: "below",
+    label: "right",
     quest: "smishx",
+    peek: ["99.38% accuracy on 3,887 test URLs", "Project manager of a 4-person team"],
   },
   {
     slug: "routa-crossroads",
@@ -329,6 +334,7 @@ export const places: Place[] = [
     y: 650,
     label: "below",
     quest: "routa",
+    peek: ["Commuter app pitch for Metro Manila", "Owned the marketing side"],
   },
   {
     slug: "cybersoft-citadel",
@@ -340,6 +346,18 @@ export const places: Place[] = [
     y: 600,
     label: "below",
     quest: "safeboxiq",
+    peek: ["40+ merge requests merged into production", "Ruby on Rails · May to Nov 2025"],
+  },
+  {
+    slug: "sealed-commission",
+    name: "Sealed Commission",
+    subtitle: "Freelance full-stack · 2026 to now",
+    kind: "sealed",
+    kindLabel: "Sealed commission",
+    x: 875,
+    y: 520,
+    label: "right",
+    peek: ["Freelance full-stack engineer", "50+ pull requests delivered", "Details sealed under NDA"],
   },
   {
     slug: "tinkers-workshop",
@@ -350,6 +368,7 @@ export const places: Place[] = [
     x: 340,
     y: 590,
     label: "below",
+    peek: [`${skillCount} languages, frameworks and tools`, "Rails, Python, Kotlin, Docker and more"],
   },
   {
     slug: "wayfarers-inn",
@@ -360,6 +379,127 @@ export const places: Place[] = [
     x: 560,
     y: 815,
     label: "right",
+    peek: ["About me", "Email, LinkedIn and CV"],
+  },
+];
+
+// ---------------------------------------------------------------------------
+// The sealed commission: current freelance work under NDA. Only the role,
+// the start year and the count below are public.
+// ---------------------------------------------------------------------------
+
+export const commission = {
+  role: "Freelance Full-Stack Engineer",
+  since: "2026",
+  stat: { value: "50+", label: "pull requests delivered" },
+};
+
+// ---------------------------------------------------------------------------
+// Character sheet (/character)
+// ---------------------------------------------------------------------------
+
+export const character = {
+  className: "Software Developer",
+  specialization: "Full-stack web · Applied ML",
+  home: "Manila, Philippines",
+  guild: "ACM Student Chapter, FEU Tech",
+};
+
+// Real numbers only. Each one is backed by a quest page, the résumé or the thesis.
+export const characterStats: Stat[] = [
+  { value: "40+", label: "merge requests merged into production" },
+  { value: commission.stat.value, label: "pull requests delivered as a freelancer" },
+  { value: "99.38%", label: "thesis model accuracy" },
+  { value: String(leadership.length), label: "leadership roles" },
+  { value: String(certifications.length), label: "certifications" },
+];
+
+export type SkillProof = { name: string; proof?: string; href?: string };
+export type SkillTier = { tier: string; blurb: string; skills: SkillProof[] };
+
+const productionSkills: SkillProof[] = [
+  { name: "Ruby on Rails", proof: "SafeboxIQ backend and forms", href: "/quests/safeboxiq" },
+  { name: "Ruby", proof: "SafeboxIQ", href: "/quests/safeboxiq" },
+  { name: "JavaScript", proof: "SafeboxIQ frontend", href: "/quests/safeboxiq" },
+  { name: "CoffeeScript", proof: "SafeboxIQ frontend", href: "/quests/safeboxiq" },
+  { name: "Docker", proof: "Every SafeboxIQ change shipped through it", href: "/quests/safeboxiq" },
+  { name: "GitLab CI/CD", proof: "SafeboxIQ pipelines", href: "/quests/safeboxiq" },
+  { name: "Git", proof: "40+ merge requests at Cybersoft", href: "/quests/safeboxiq" },
+];
+
+const projectSkills: SkillProof[] = [
+  { name: "Python", proof: "SmishX model · IT Specialist certified", href: "/quests/smishx" },
+  { name: "Kotlin", proof: "SmishX Android app", href: "/quests/smishx" },
+];
+
+const proven = new Set([...productionSkills, ...projectSkills].map((skill) => skill.name));
+
+// Skills grouped by how they were proven. Move a skill up a tier when there's
+// public evidence for it.
+export const skillTiers: SkillTier[] = [
+  {
+    tier: "Shipped to production",
+    blurb: "Used on SafeboxIQ, where everything I built was merged into production.",
+    skills: productionSkills,
+  },
+  {
+    tier: "Used in projects",
+    blurb: "Proven on SmishX, my thesis project.",
+    skills: projectSkills,
+  },
+  {
+    tier: "Also in the toolbox",
+    blurb: "Languages and tools I've worked with, from my résumé.",
+    skills: skillGroups
+      .flatMap((group) => group.items)
+      .filter((name) => !proven.has(name))
+      .map((name) => ({ name })),
+  },
+];
+
+export type Achievement = {
+  title: string;
+  detail: string;
+  year: string;
+  icon: "honor" | "cert" | "lead" | "craft" | "quest" | "seal";
+};
+
+export const achievements: Achievement[] = [
+  { title: "Top Performing Student", detail: "FEU Tech, AY 2021–2022", year: "2022", icon: "honor" },
+  { title: "IT Specialist: Java", detail: "Certiport / Pearson VUE", year: "2022", icon: "cert" },
+  {
+    title: "Tournament Director",
+    detail: "Ran university-wide esports tournaments for Itamaraws Esports Club",
+    year: "2022–23",
+    icon: "lead",
+  },
+  { title: "IT Specialist: Python", detail: "Certiport / Pearson VUE", year: "2023", icon: "cert" },
+  { title: "CCNA – DevNet Associate", detail: "Cisco", year: "2024", icon: "cert" },
+  {
+    title: "Thesis Accepted",
+    detail: "SmishX, reviewed and validated by DICT IT officers",
+    year: "2024",
+    icon: "quest",
+  },
+  {
+    title: "99.38% Accuracy",
+    detail: "SmishX's stacked model on 3,887 held-out URLs",
+    year: "2024",
+    icon: "craft",
+  },
+  { title: "Hackathon Host", detail: "Ran ACM Kode Kombat: Ascension 2024", year: "2024", icon: "lead" },
+  {
+    title: "Shipped to Production",
+    detail: "40+ merge requests merged into production at Cybersoft",
+    year: "2025",
+    icon: "craft",
+  },
+  { title: "Graduated", detail: "BS Computer Science, FEU Tech", year: "2025", icon: "honor" },
+  {
+    title: "Sealed Commission",
+    detail: "Freelance full-stack engineer, 50+ pull requests delivered",
+    year: "2026",
+    icon: "seal",
   },
 ];
 
