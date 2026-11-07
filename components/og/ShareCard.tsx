@@ -48,15 +48,17 @@ export async function renderShareCard({
   line: string;
   tagline: string;
 }) {
-  const [fraunces, fell, literata] = await Promise.all([
-    googleFont("Fraunces:wght@600", title),
-    googleFont("IM+Fell+English+SC", `${kicker}${line}`),
-    googleFont("Literata:ital@1", tagline),
+  // Same faces as the site: Cormorant Garamond for the name, Jost for labels
+  // (set in capitals, so the subset needs the capital letters) and text.
+  const [cormorant, jostLabel, jostItalic] = await Promise.all([
+    googleFont("Cormorant+Garamond:wght@700", title),
+    googleFont("Jost:wght@500", `${kicker}${line}`.toUpperCase()),
+    googleFont("Jost:ital,wght@1,400", tagline),
   ]);
   const fonts = [
-    fraunces && { name: "Fraunces", data: fraunces, weight: 600 as const, style: "normal" as const },
-    fell && { name: "Fell", data: fell, weight: 400 as const, style: "normal" as const },
-    literata && { name: "Literata", data: literata, weight: 400 as const, style: "italic" as const },
+    cormorant && { name: "Cormorant", data: cormorant, weight: 700 as const, style: "normal" as const },
+    jostLabel && { name: "Jost", data: jostLabel, weight: 500 as const, style: "normal" as const },
+    jostItalic && { name: "Jost", data: jostItalic, weight: 400 as const, style: "italic" as const },
   ].filter((font) => font !== null);
 
   return new ImageResponse(
@@ -73,27 +75,51 @@ export async function renderShareCard({
           }}
         >
           <div style={{ display: "flex", flexDirection: "column", maxWidth: 760 }}>
-            <div style={{ display: "flex", fontFamily: "Fell", fontSize: 40, color: INK_SOFT }}>{kicker}</div>
             <div
               style={{
                 display: "flex",
-                fontFamily: "Fraunces",
-                fontSize: 88,
+                fontFamily: "Jost",
+                fontWeight: 500,
+                fontSize: 28,
+                letterSpacing: 4,
+                textTransform: "uppercase",
+                color: INK_SOFT,
+              }}
+            >
+              {kicker}
+            </div>
+            <div
+              style={{
+                display: "flex",
+                fontFamily: "Cormorant",
+                fontWeight: 700,
+                fontSize: 100,
                 lineHeight: 1,
-                letterSpacing: -2,
+                letterSpacing: -1,
                 color: INK,
-                marginTop: 6,
+                marginTop: 10,
               }}
             >
               {title}
             </div>
-            <div style={{ display: "flex", fontFamily: "Fell", fontSize: 40, color: SEAL, marginTop: 18 }}>
+            <div
+              style={{
+                display: "flex",
+                fontFamily: "Jost",
+                fontWeight: 500,
+                fontSize: 28,
+                letterSpacing: 4,
+                textTransform: "uppercase",
+                color: SEAL,
+                marginTop: 20,
+              }}
+            >
               {line}
             </div>
             <div
               style={{
                 display: "flex",
-                fontFamily: "Literata",
+                fontFamily: "Jost",
                 fontStyle: "italic",
                 fontSize: 30,
                 lineHeight: 1.35,

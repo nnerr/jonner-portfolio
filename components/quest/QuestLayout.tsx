@@ -9,7 +9,7 @@ function Section({ id, title, children }: { id: string; title: string; children:
     <section aria-labelledby={id}>
       <h2
         id={id}
-        className="font-display flex items-center gap-3 text-[1.85rem] leading-tight font-semibold tracking-[-0.01em]"
+        className="font-display flex items-center gap-3 text-[2.15rem] leading-tight font-semibold tracking-[-0.01em]"
       >
         <svg width="12" height="12" viewBox="-6 -6 12 12" aria-hidden="true" className="flex-none">
           <path d="M0 -5.5L5.5 0L0 5.5L-5.5 0Z" fill="var(--seal)" />
@@ -39,7 +39,7 @@ export function QuestLayout({ quest, place, next }: { quest: Quest; place: Place
       <header className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 pt-5 sm:px-6">
         <Link
           href={mapHref}
-          className="font-fell inline-flex min-h-11 items-center gap-2 text-[1.08rem] text-ink-soft hover:text-ink"
+          className="font-label inline-flex min-h-11 items-center gap-2 text-[1.08rem] text-ink-soft hover:text-ink"
         >
           <span aria-hidden="true">←</span> Back to the atlas
         </Link>
@@ -50,7 +50,7 @@ export function QuestLayout({ quest, place, next }: { quest: Quest; place: Place
 
       <main className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
         <div className="border-b border-ink/25 pt-8 pb-9 sm:pt-12">
-          <p className="font-fell text-[1.15rem] text-seal">
+          <p className="font-label text-[1.15rem] text-seal">
             {place.name} · {quest.kind === "main" ? "Main quest" : "Side quest"}
           </p>
           <h1 className="font-display mt-2 text-[3.6rem] leading-[0.95] font-semibold tracking-[-0.03em] sm:text-[5.25rem]">
@@ -147,7 +147,7 @@ export function QuestLayout({ quest, place, next }: { quest: Quest; place: Place
           aria-label="More quests"
           className="mt-16 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t border-ink/25 pt-6"
         >
-          <Link href={mapHref} className="font-fell inline-flex min-h-11 items-center gap-2 text-[1.1rem] text-ink-soft hover:text-ink">
+          <Link href={mapHref} className="font-label inline-flex min-h-11 items-center gap-2 text-[1.1rem] text-ink-soft hover:text-ink">
             <span aria-hidden="true">←</span> Return to the atlas
           </Link>
           <Link href={`/quests/${next.slug}`} className="btn-ink">

@@ -20,7 +20,7 @@ function Section({ id, title, children }: { id: string; title: string; children:
     <section aria-labelledby={id}>
       <h2
         id={id}
-        className="font-display flex items-center gap-3 text-[1.85rem] leading-tight font-semibold tracking-[-0.01em]"
+        className="font-display flex items-center gap-3 text-[2.15rem] leading-tight font-semibold tracking-[-0.01em]"
       >
         <svg width="12" height="12" viewBox="-6 -6 12 12" aria-hidden="true" className="flex-none">
           <path d="M0 -5.5L5.5 0L0 5.5L-5.5 0Z" fill="var(--seal)" />
@@ -35,7 +35,7 @@ function Section({ id, title, children }: { id: string; title: string; children:
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="py-2.5">
-      <dt className="font-fell text-[0.98rem] text-ink-soft">{label}</dt>
+      <dt className="font-label text-[0.98rem] text-ink-soft">{label}</dt>
       <dd className="mt-0.5 leading-snug">{children}</dd>
     </div>
   );
@@ -54,8 +54,8 @@ function CharacterCard() {
           priority
         />
       </div>
-      <p className="font-display mt-5 text-center text-[1.35rem] leading-tight font-semibold">{profile.name}</p>
-      <p className="font-fell text-center text-[1.05rem] text-seal">{character.className}</p>
+      <p className="font-display mt-5 text-center text-[1.65rem] leading-tight font-semibold">{profile.name}</p>
+      <p className="font-label text-center text-[1.05rem] text-seal">{character.className}</p>
       <dl className="mt-4 divide-y divide-ink/15 border-t border-ink/15">
         <Row label="Specialization">{character.specialization}</Row>
         <Row label="Home">{character.home}</Row>
@@ -97,7 +97,7 @@ function Skills() {
         const withProof = tier.skills.some((skill) => skill.proof);
         return (
           <div key={tier.tier}>
-            <h3 className="font-fell text-[1.25rem] leading-tight">{tier.tier}</h3>
+            <h3 className="font-label text-[1.25rem] leading-tight">{tier.tier}</h3>
             <p className="mt-0.5 text-[0.95rem] italic text-ink-soft">{tier.blurb}</p>
             {withProof ? (
               <ul className="mt-3 divide-y divide-ink/15 border-y border-ink/15">
@@ -140,7 +140,7 @@ function Achievements() {
         <li key={achievement.title} className="flex gap-3">
           <Medallion icon={achievement.icon} />
           <div className="min-w-0">
-            <p className="font-display text-[1.08rem] leading-tight font-semibold">{achievement.title}</p>
+            <p className="font-display text-[1.3rem] leading-tight font-semibold">{achievement.title}</p>
             <p className="mt-0.5 text-[0.92rem] leading-snug text-ink-soft">{achievement.detail}</p>
             <p className="mt-0.5 text-[0.88rem] italic text-ink-soft">Unlocked {achievement.year}</p>
           </div>
@@ -161,7 +161,7 @@ function QuestLog() {
             <Link href={`/quests/${quest.slug}`} className="group flex items-center gap-4 py-3.5 no-underline">
               <Seal kind={quest.kind} visited className="h-8 w-8 flex-none" />
               <span className="min-w-0 flex-1">
-                <span className="font-display block text-[1.15rem] leading-tight font-semibold group-hover:underline">
+                <span className="font-display block text-[1.4rem] leading-tight font-semibold group-hover:underline">
                   {quest.title}
                 </span>
                 <span className="block text-[0.92rem] text-ink-soft">
@@ -169,7 +169,7 @@ function QuestLog() {
                   {place ? ` · ${place.name}` : ""} · {quest.season}
                 </span>
               </span>
-              <span className="font-fell text-[0.98rem] text-ink-soft">Completed</span>
+              <span className="font-label text-[0.98rem] text-ink-soft">Completed</span>
               <span aria-hidden="true" className="text-ink-soft group-hover:text-ink">
                 →
               </span>
@@ -182,14 +182,14 @@ function QuestLog() {
           <Link href={`/#${sealed.slug}`} className="group flex items-center gap-4 py-3.5 no-underline">
             <Seal kind="sealed" className="h-8 w-8 flex-none" />
             <span className="min-w-0 flex-1">
-              <span className="font-display block text-[1.15rem] leading-tight font-semibold group-hover:underline">
+              <span className="font-display block text-[1.4rem] leading-tight font-semibold group-hover:underline">
                 {sealed.name}
               </span>
               <span className="block text-[0.92rem] text-ink-soft">
                 Since {commission.since} · details sealed under NDA
               </span>
             </span>
-            <span className="font-fell text-[0.98rem] text-seal">In progress</span>
+            <span className="font-label text-[0.98rem] text-seal">In progress</span>
             <span aria-hidden="true" className="text-ink-soft group-hover:text-ink">
               →
             </span>
@@ -205,8 +205,8 @@ function GuildRanks() {
     <ol className="grid gap-x-8 gap-y-5 sm:grid-cols-2">
       {leadership.map((rank) => (
         <li key={`${rank.role}-${rank.org}`}>
-          <p className="font-fell text-[1.02rem] text-seal">{rank.role}</p>
-          <p className="font-display text-[1.15rem] leading-tight font-semibold">{rank.org}</p>
+          <p className="font-label text-[1.02rem] text-seal">{rank.role}</p>
+          <p className="font-display text-[1.4rem] leading-tight font-semibold">{rank.org}</p>
           <p className="text-[0.92rem] text-ink-soft">{rank.years}</p>
         </li>
       ))}
@@ -220,7 +220,7 @@ export function CharacterSheet() {
       <header className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 pt-5 sm:px-6">
         <Link
           href="/"
-          className="font-fell inline-flex min-h-11 items-center gap-2 text-[1.08rem] text-ink-soft hover:text-ink"
+          className="font-label inline-flex min-h-11 items-center gap-2 text-[1.08rem] text-ink-soft hover:text-ink"
         >
           <span aria-hidden="true">←</span> Back to the atlas <kbd className="hidden lg:inline">Esc</kbd>
         </Link>
@@ -231,7 +231,7 @@ export function CharacterSheet() {
 
       <main className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
         <div className="border-b border-ink/25 pt-8 pb-8 sm:pt-12">
-          <p className="font-fell text-[1.15rem] text-seal">Character sheet</p>
+          <p className="font-label text-[1.15rem] text-seal">Character sheet</p>
           <h1 className="font-display mt-2 text-[2.9rem] leading-[0.98] font-semibold tracking-[-0.025em] sm:text-[4.25rem]">
             {profile.name}
           </h1>
@@ -265,7 +265,7 @@ export function CharacterSheet() {
         <nav aria-label="Back to the map" className="mt-16 border-t border-ink/25 pt-6">
           <Link
             href="/"
-            className="font-fell inline-flex min-h-11 items-center gap-2 text-[1.1rem] text-ink-soft hover:text-ink"
+            className="font-label inline-flex min-h-11 items-center gap-2 text-[1.1rem] text-ink-soft hover:text-ink"
           >
             <span aria-hidden="true">←</span> Return to the atlas
           </Link>

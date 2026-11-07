@@ -1,5 +1,5 @@
 import type { MouseEvent } from "react";
-import { MAP_HEIGHT, MAP_WIDTH, type Place } from "@/lib/content";
+import { mapPercent, type Place } from "@/lib/content";
 import { Seal } from "./Seal";
 
 export function PlacePin({
@@ -16,10 +16,7 @@ export function PlacePin({
   return (
     <li
       className="place-item"
-      style={{
-        left: `${(place.x / MAP_WIDTH) * 100}%`,
-        top: `${(place.y / MAP_HEIGHT) * 100}%`,
-      }}
+      style={mapPercent(place.x, place.y)}
     >
       <a
         id={`place-${place.slug}`}

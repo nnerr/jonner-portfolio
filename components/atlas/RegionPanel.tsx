@@ -23,11 +23,11 @@ export function RegionPanel({
     >
       <div className="region-panel__inner">
         <div className="flex items-center justify-between gap-4">
-          <p className="font-fell text-[1.05rem] text-seal">{place.kindLabel}</p>
+          <p className="font-label text-[1.05rem] text-seal">{place.kindLabel}</p>
           <a
             href="#map"
             onClick={onClose}
-            className="font-fell -mr-2 inline-flex min-h-11 items-center gap-2 px-2 text-[1rem] text-ink-soft hover:text-ink"
+            className="font-label -mr-2 inline-flex min-h-11 items-center gap-2 px-2 text-[1rem] text-ink-soft hover:text-ink"
           >
             <span>Close</span>
             <kbd className="hidden lg:inline">Esc</kbd>
@@ -37,7 +37,7 @@ export function RegionPanel({
         <h2
           id={`${place.slug}-title`}
           tabIndex={-1}
-          className="font-display mt-1 text-[2.15rem] leading-[1.05] font-semibold tracking-[-0.01em] outline-none"
+          className="font-display mt-1 text-[2.45rem] leading-[1.05] font-semibold tracking-[-0.01em] outline-none"
         >
           {place.name}
         </h2>

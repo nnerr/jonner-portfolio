@@ -1,30 +1,21 @@
 import type { Metadata } from "next";
-import { Fraunces, IM_Fell_English_SC, Literata } from "next/font/google";
+import { Cormorant_Garamond, Jost } from "next/font/google";
 import { SITE_URL, profile } from "@/lib/content";
 import "./globals.css";
 
-// Engraved small caps for map labels, kickers and the legend.
-const fell = IM_Fell_English_SC({
-  weight: "400",
+// Names and headings: an elegant serif.
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  variable: "--font-fell",
+  weight: ["500", "600", "700"],
+  variable: "--font-cormorant",
   display: "swap",
 });
 
-// Headings and the name.
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
-  axes: ["SOFT", "WONK", "opsz"],
-  display: "swap",
-});
-
-// Body text.
-const literata = Literata({
+// Labels, buttons and reading text: a clean geometric sans.
+const jost = Jost({
   subsets: ["latin"],
   style: ["normal", "italic"],
-  variable: "--font-literata",
-  axes: ["opsz"],
+  variable: "--font-jost",
   display: "swap",
 });
 
@@ -70,7 +61,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fell.variable} ${fraunces.variable} ${literata.variable} antialiased`}
+      className={`${cormorant.variable} ${jost.variable} antialiased`}
     >
       <body className="min-h-svh">{children}</body>
     </html>

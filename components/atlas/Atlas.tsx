@@ -10,7 +10,7 @@ import {
 } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MAP_HEIGHT, MAP_WIDTH, type Place } from "@/lib/content";
+import { MAP_VIEW, mapPercent, type Place } from "@/lib/content";
 import { DiscoveryToast } from "./DiscoveryToast";
 import { FastTravel } from "./FastTravel";
 import { rng } from "./geometry";
@@ -50,6 +50,8 @@ type Props = {
 };
 
 const ZOOM = 1.3;
+// Room the docked panel takes on wide screens (its width plus a margin).
+const panelSpace = (stageW: number) => Math.min(440, stageW * 0.42) + 24;
 
 // A few puffy cloud shapes, fixed per seed so server and client agree.
 const FOG_SHAPES = Array.from({ length: 9 }, (_, seed) => {
@@ -83,11 +85,6 @@ function FogCloud({ seed }: { seed: number }) {
   );
 }
 
-const position = (x: number, y: number) => ({
-  left: `${(x / MAP_WIDTH) * 100}%`,
-  top: `${(y / MAP_HEIGHT) * 100}%`,
-});
-
 /** Ignore clicks that should keep their default browser behaviour. */
 function isPlainClick(event: MouseEvent) {
   return !(
@@ -98,6 +95,14 @@ function isPlainClick(event: MouseEvent) {
     event.shiftKey ||
     event.altKey
   );
+}
+
+/** Where a map coordinate sits inside the rendered sheet, in pixels. */
+function sheetPoint(x: number, y: number, layout: Layout) {
+  return {
+    x: ((x - MAP_VIEW.x) / MAP_VIEW.w) * layout.sheetW,
+    y: ((y - MAP_VIEW.y) / MAP_VIEW.h) * layout.sheetH,
+  };
 }
 
 export function Atlas({
@@ -115,7 +120,10 @@ export function Atlas({
   const hash = useHash();
   const visited = useVisited();
   const hydrated = useHydrated();
-  const desktop = useMediaQuery("(min-width: 1024px)");
+  // Wide screens get the docked panel and the full HUD.
+  const wide = useMediaQuery("(min-width: 1024px)");
+  // Landscape screens show the whole island at once; taller ones scroll it.
+  const landscape = useMediaQuery("(min-aspect-ratio: 5/4)");
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
   const hashSlug = hash.slice(1);
@@ -123,12 +131,14 @@ export function Atlas({
   const active = activePlace?.slug ?? null;
 
   const [travelOpen, setTravelOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [layout, setLayout] = useState<Layout | null>(null);
 
   const stageRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const travelRef = useRef<HTMLDetailsElement>(null);
+  const menuRef = useRef<HTMLDetailsElement>(null);
   // Whether the open panel added its own history entry (so Close can go back).
   const pushedRef = useRef(false);
   // Focus requests that run after React has shown or hidden a panel.
@@ -176,22 +186,26 @@ export function Atlas({
     return () => observer.disconnect();
   }, []);
 
-  // Small screens: the map scrolls sideways. Start centred, then follow the open place.
+  // Taller screens pan the map by scrolling. Start centred, then bring the
+  // open place into the middle of the free space.
   useEffect(() => {
     const scroller = scrollerRef.current;
-    const sheet = sheetRef.current;
-    if (!hydrated || desktop || !scroller || !sheet) return;
-    const target = activePlace
-      ? sheet.offsetLeft + (activePlace.x / MAP_WIDTH) * sheet.offsetWidth - scroller.clientWidth / 2
-      : (scroller.scrollWidth - scroller.clientWidth) / 2;
-    scroller.scrollTo({
-      left: target,
-      behavior: activePlace && !reducedMotion ? "smooth" : "auto",
-    });
-  }, [activePlace, desktop, hydrated, reducedMotion]);
+    if (!hydrated || landscape || !scroller || !layout) return;
+    let left = (scroller.scrollWidth - scroller.clientWidth) / 2;
+    let top = (scroller.scrollHeight - scroller.clientHeight) / 2;
+    if (activePlace) {
+      const point = sheetPoint(activePlace.x, activePlace.y - 30, layout);
+      const freeW = wide ? layout.stageW - panelSpace(layout.stageW) : layout.stageW;
+      // On phones the panel is a sheet over the lower half, so aim higher.
+      const freeH = wide ? layout.stageH : layout.stageH * 0.45;
+      left = point.x - freeW / 2;
+      top = point.y - freeH / 2;
+    }
+    scroller.scrollTo({ left, top, behavior: activePlace && !reducedMotion ? "smooth" : "auto" });
+  }, [activePlace, hydrated, landscape, layout, reducedMotion, wide]);
 
-  // Fast travel: focus the first stop when opened from the keyboard, and
-  // close when clicking anywhere else.
+  // Fast travel and the phone menu: focus the first stop when opened from the
+  // keyboard, and close when clicking anywhere else.
   useEffect(() => {
     if (!travelOpen) return;
     if (focusTravelRef.current) {
@@ -212,6 +226,7 @@ export function Atlas({
         event.preventDefault();
       }
       setTravelOpen(false);
+      setMenuOpen(false);
       focusPanelRef.current = slug;
       if (active === slug) {
         document.getElementById(`${slug}-title`)?.focus({ preventScroll: true });
@@ -242,7 +257,8 @@ export function Atlas({
     [active],
   );
 
-  // Keyboard: Esc closes, M toggles fast travel, C opens the character sheet.
+  // Keyboard: Esc closes, M toggles fast travel (the menu on small screens),
+  // C opens the character sheet.
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
@@ -254,13 +270,20 @@ export function Atlas({
         if (travelOpen) {
           setTravelOpen(false);
           travelRef.current?.querySelector("summary")?.focus();
+        } else if (menuOpen) {
+          setMenuOpen(false);
+          menuRef.current?.querySelector("summary")?.focus();
         } else if (active) {
           close();
         }
-      } else if ((event.key === "m" || event.key === "M") && desktop) {
+      } else if (event.key === "m" || event.key === "M") {
         event.preventDefault();
-        focusTravelRef.current = !travelOpen;
-        setTravelOpen(!travelOpen);
+        if (wide) {
+          focusTravelRef.current = !travelOpen;
+          setTravelOpen(!travelOpen);
+        } else {
+          setMenuOpen(!menuOpen);
+        }
       } else if (event.key === "c" || event.key === "C") {
         event.preventDefault();
         router.push("/character");
@@ -268,23 +291,19 @@ export function Atlas({
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [active, close, desktop, router, travelOpen]);
+  }, [active, close, menuOpen, router, travelOpen, wide]);
 
-  // Desktop pan and zoom: bring the open place to the middle of the free space
-  // left of the panel.
-  // The map is clamped so its edges don't pull away from the free space,
-  // which would leave a strip of bare page showing.
+  // Wide landscape screens: frame the open place in the free space left of the
+  // panel. The map may slide under the panel (the page behind it is sea too),
+  // but never far enough to leave a bare edge in the visible part.
   let transform: string | undefined;
-  if (activePlace && desktop && !reducedMotion && layout) {
-    const px = (activePlace.x / MAP_WIDTH) * layout.sheetW;
-    const py = ((activePlace.y - 30) / MAP_HEIGHT) * layout.sheetH;
-    const freeW = layout.stageW - (Math.min(440, layout.stageW * 0.42) + 20);
+  if (activePlace && wide && landscape && !reducedMotion && layout) {
+    const point = sheetPoint(activePlace.x, activePlace.y - 30, layout);
+    const freeW = layout.stageW - panelSpace(layout.stageW);
     const scaledW = ZOOM * layout.sheetW;
     const scaledH = ZOOM * layout.sheetH;
-    let left = freeW / 2 - ZOOM * px;
-    let top = layout.stageH / 2 - ZOOM * py;
-    if (scaledW >= freeW) left = Math.min(0, Math.max(freeW - scaledW, left));
-    if (scaledH >= layout.stageH) top = Math.min(0, Math.max(layout.stageH - scaledH, top));
+    const left = Math.min(0, Math.max(freeW - scaledW, freeW / 2 - ZOOM * point.x));
+    const top = Math.min(0, Math.max(layout.stageH - scaledH, layout.stageH / 2 - ZOOM * point.y));
     const tx = left - layout.sheetX;
     const ty = top - layout.sheetY;
     transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale(${ZOOM})`;
@@ -292,17 +311,34 @@ export function Atlas({
 
   const explored = places.filter((place) => visited.includes(place.slug)).length;
 
+  const exploredLine = (
+    <>
+      <span>
+        Explored {explored} of {places.length}
+      </span>
+      {explored > 0 && (
+        <button
+          type="button"
+          onClick={resetVisited}
+          className="min-h-11 cursor-pointer px-1 text-ink-soft underline decoration-1 underline-offset-3 hover:text-ink"
+        >
+          Reset map
+        </button>
+      )}
+    </>
+  );
+
   return (
     <div
       className="atlas"
       data-js={hydrated ? "" : undefined}
       data-panel={hydrated && active ? "open" : undefined}
     >
-      <header className="atlas-header">
+      <header className="hud hud--top">
         {header}
-        <div className="atlas-actions">
-          <Link href="/character" className="btn-ink">
-            Character <kbd className="hidden lg:inline">C</kbd>
+        <div className="hud-actions">
+          <Link href="/character" className="btn-ink hidden lg:inline-flex">
+            Character <kbd>C</kbd>
           </Link>
           <details
             ref={travelRef}
@@ -319,9 +355,40 @@ export function Atlas({
               </nav>
             </div>
           </details>
-          <a className="btn-ink" href={resume} download>
+          <a className="btn-ink hidden lg:inline-flex" href={resume} download>
             Download CV
           </a>
+
+          {/* Small screens: one Menu button opens a journal with everything. */}
+          <details
+            ref={menuRef}
+            className="hud-menu lg:hidden"
+            open={menuOpen}
+            onToggle={(event) => setMenuOpen(event.currentTarget.open)}
+          >
+            <summary className="btn-ink">{menuOpen ? "Close" : "Menu"}</summary>
+            <div className="menu-backdrop" onClick={() => setMenuOpen(false)} aria-hidden="true" />
+            <div className="menu-sheet">
+              <p className="font-label text-[1.35rem] leading-tight">Journal</p>
+              <div className="mt-3 flex flex-wrap gap-2.5">
+                <Link href="/character" className="btn-ink">
+                  Character sheet
+                </Link>
+                <a className="btn-ink" href={resume} download>
+                  Download CV
+                </a>
+              </div>
+              <nav aria-label="Fast travel" className="mt-5">
+                <h2 className="font-label mb-1 text-[1.15rem] text-ink-soft">Fast travel</h2>
+                <FastTravel places={places} visited={visited} onSelect={open} />
+              </nav>
+              <div className="mt-5">
+                <h2 className="font-label mb-2 text-[1.15rem] text-ink-soft">Legend</h2>
+                <Legend />
+              </div>
+              <p className="mt-4 flex items-center gap-3 text-[0.95rem] italic text-ink-soft">{exploredLine}</p>
+            </div>
+          </details>
         </div>
       </header>
 
@@ -336,13 +403,13 @@ export function Atlas({
                   key={place.slug}
                   className="fog"
                   data-cleared={visited.includes(place.slug) ? "" : undefined}
-                  style={position(place.x, place.y)}
+                  style={mapPercent(place.x, place.y)}
                 >
                   <FogCloud seed={i} />
                 </div>
               ))}
               {uncharted.map((spot, i) => (
-                <div key={spot.label} className="fog fog--uncharted" style={position(spot.x, spot.y)}>
+                <div key={spot.label} className="fog fog--uncharted" style={mapPercent(spot.x, spot.y)}>
                   <FogCloud seed={places.length + i} />
                 </div>
               ))}
@@ -350,8 +417,8 @@ export function Atlas({
 
             <div className="uncharted-layer" aria-hidden="true">
               {uncharted.map((spot) => (
-                <div key={spot.label} className="uncharted-label" style={position(spot.x, spot.y)}>
-                  <span className="font-fell block text-[1.02rem] text-ink-soft">{spot.label}</span>
+                <div key={spot.label} className="uncharted-label" style={mapPercent(spot.x, spot.y)}>
+                  <span className="font-label block text-[1.02rem] text-ink-soft">{spot.label}</span>
                   <span className="block text-[0.74rem] italic text-ink-soft">
                     A new project, still in the fog
                   </span>
@@ -372,66 +439,54 @@ export function Atlas({
             </ol>
           </div>
         </div>
-
-        <p className="px-4 text-[0.92rem] italic text-ink-soft lg:hidden">
-          Swipe the map to explore. Tap a seal to open a place.
-        </p>
-
-        <DiscoveryToast region={region} />
-
-        <div className="panel-backdrop" onClick={() => close()} aria-hidden="true" />
-        {panels.map(({ slug, content }) => {
-          const place = places.find((p) => p.slug === slug);
-          if (!place) return null;
-          return (
-            <RegionPanel key={slug} place={place} open={slug === active} onClose={close}>
-              {content}
-            </RegionPanel>
-          );
-        })}
       </div>
 
-      <section className="px-4 pt-2 pb-4 lg:hidden" aria-labelledby="fast-travel-heading">
-        <h2 id="fast-travel-heading" className="font-fell mb-1 text-[1.15rem] text-ink-soft">
-          Fast travel
-        </h2>
-        <nav aria-label="Fast travel">
-          <FastTravel places={places} visited={visited} onSelect={open} />
-        </nav>
-      </section>
-
-      <footer className="atlas-footer">
-        <Legend />
+      <footer className="hud hud--bottom">
+        <div className="hud-card legend-card hidden lg:block">
+          <Legend />
+        </div>
         {activeQuest && (
           <a
             href={`#${innSlug}`}
             onClick={(event) => open(innSlug, event)}
-            className="group order-first inline-flex items-center gap-2.5 no-underline lg:order-0"
+            className="hud-card quest-card group no-underline"
           >
             <Seal kind="inn" className="h-6 w-6 flex-none" />
             <span className="leading-tight">
-              <span className="font-fell block text-[0.92rem] text-seal">Active quest</span>
-              <span className="font-display text-[1.05rem] font-semibold text-ink underline decoration-1 underline-offset-3 group-hover:decoration-2">
+              <span className="font-label block text-[0.92rem] text-seal">Active quest</span>
+              <span className="font-display text-[1.3rem] font-semibold text-ink underline decoration-1 underline-offset-3 group-hover:decoration-2">
                 {activeQuest}
               </span>
             </span>
           </a>
         )}
-        <p className="flex items-center gap-3 text-[0.95rem] italic text-ink-soft" aria-live="polite">
-          <span>
-            Explored {explored} of {places.length}
-          </span>
-          {explored > 0 && (
-            <button
-              type="button"
-              onClick={resetVisited}
-              className="min-h-11 cursor-pointer px-1 text-ink-soft underline decoration-1 underline-offset-3 hover:text-ink"
-            >
-              Reset map
-            </button>
-          )}
+        <p className="hud-card explored-card hidden lg:flex" aria-live="polite">
+          {exploredLine}
+        </p>
+        <p className="swipe-hint hud-card" aria-hidden="true">
+          Swipe to explore · tap a seal
         </p>
       </footer>
+
+      <div className="hud-frame" aria-hidden="true">
+        <i className="hud-frame__band hud-frame__band--top" />
+        <i className="hud-frame__band hud-frame__band--bottom" />
+        <i className="hud-frame__band hud-frame__band--left" />
+        <i className="hud-frame__band hud-frame__band--right" />
+      </div>
+
+      <DiscoveryToast region={region} />
+
+      <div className="panel-backdrop" onClick={() => close()} aria-hidden="true" />
+      {panels.map(({ slug, content }) => {
+        const place = places.find((p) => p.slug === slug);
+        if (!place) return null;
+        return (
+          <RegionPanel key={slug} place={place} open={slug === active} onClose={close}>
+            {content}
+          </RegionPanel>
+        );
+      })}
     </div>
   );
 }

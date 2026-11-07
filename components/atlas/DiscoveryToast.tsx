@@ -9,7 +9,7 @@ export function DiscoveryToast({ region }: { region: string }) {
   if (!show) return null;
   return (
     <div className="discovery" aria-hidden="true">
-      <span className="font-fell text-[1.05rem] text-ink-soft">Region discovered</span>
+      <span className="font-label text-[1.05rem] text-ink-soft">Region discovered</span>
       <span className="discovery__rule" />
       <span className="font-display text-[2.6rem] leading-none font-semibold tracking-[0.02em] text-ink">
         {region}

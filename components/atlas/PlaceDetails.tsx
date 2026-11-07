@@ -34,7 +34,7 @@ function StatRow({ stats }: { stats: { value: string; label: string }[] }) {
 }
 
 function SubHeading({ children }: { children: React.ReactNode }) {
-  return <h3 className="font-fell text-[1.2rem] leading-tight text-ink">{children}</h3>;
+  return <h3 className="font-label text-[1.2rem] leading-tight text-ink">{children}</h3>;
 }
 
 function QuestSummary({ slug, stats }: { slug: string; stats?: string[] }) {
@@ -45,7 +45,7 @@ function QuestSummary({ slug, stats }: { slug: string; stats?: string[] }) {
     <>
       <p>{quest.summary}</p>
       <p className="mt-3 text-[0.95rem] text-ink-soft">
-        <span className="font-fell text-ink">Role:</span> {quest.role}
+        <span className="font-label text-ink">Role:</span> {quest.role}
       </p>
       {quest.note && <p className="mt-3 text-[0.95rem] italic text-ink-soft">{quest.note}</p>}
       {shown && shown.length > 0 && <StatRow stats={shown} />}
@@ -66,7 +66,7 @@ export function PlaceDetails({ slug }: { slug: string }) {
     case "feu-highlands":
       return (
         <>
-          <p className="font-display text-[1.3rem] leading-snug font-semibold">{education.degree}</p>
+          <p className="font-display text-[1.55rem] leading-snug font-semibold">{education.degree}</p>
           <p className="text-ink-soft">{education.specialization}</p>
           <p className="mt-3">
             {education.school}, {education.location}
@@ -74,7 +74,7 @@ export function PlaceDetails({ slug }: { slug: string }) {
           <p className="text-ink-soft">{education.years}</p>
           {education.honors.map((honor) => (
             <p key={honor} className="mt-3">
-              <span className="font-fell text-seal">Honor:</span> {honor}
+              <span className="font-label text-seal">Honor:</span> {honor}
             </p>
           ))}
           <div className="mt-7">
@@ -104,8 +104,8 @@ export function PlaceDetails({ slug }: { slug: string }) {
         <ol className="space-y-7">
           {leadership.map((item) => (
             <li key={`${item.role}-${item.org}`}>
-              <p className="font-fell text-[1.02rem] text-seal">{item.role}</p>
-              <p className="font-display text-[1.25rem] leading-tight font-semibold">{item.org}</p>
+              <p className="font-label text-[1.02rem] text-seal">{item.role}</p>
+              <p className="font-display text-[1.5rem] leading-tight font-semibold">{item.org}</p>
               <p className="text-[0.92rem] text-ink-soft">
                 {item.orgLong ? `${item.orgLong} · ` : ""}
                 {item.years}
@@ -132,7 +132,7 @@ export function PlaceDetails({ slug }: { slug: string }) {
     case "sealed-commission":
       return (
         <>
-          <p className="font-display text-[1.3rem] leading-snug font-semibold">{commission.role}</p>
+          <p className="font-display text-[1.55rem] leading-snug font-semibold">{commission.role}</p>
           <p className="text-ink-soft">{commission.since} to now</p>
           <p className="mt-4">
             I&rsquo;m working as a freelance full-stack engineer. The client and the work are under
@@ -172,20 +172,20 @@ export function PlaceDetails({ slug }: { slug: string }) {
           </div>
           {profile.activeQuest && (
             <div className="mt-6 border-y border-ink/20 py-4">
-              <p className="font-fell text-[1rem] text-seal">Active quest</p>
-              <p className="font-display text-[1.3rem] leading-snug font-semibold">{profile.activeQuest}</p>
+              <p className="font-label text-[1rem] text-seal">Active quest</p>
+              <p className="font-display text-[1.55rem] leading-snug font-semibold">{profile.activeQuest}</p>
             </div>
           )}
-          <h3 className="font-fell mt-6 text-[1.2rem] leading-tight text-ink">Send word</h3>
+          <h3 className="font-label mt-6 text-[1.2rem] leading-tight text-ink">Send word</h3>
           <ul className="mt-3 space-y-3">
             <li>
-              <span className="font-fell block text-[0.95rem] text-ink-soft">Email</span>
+              <span className="font-label block text-[0.95rem] text-ink-soft">Email</span>
               <a className="link-seal break-all" href={`mailto:${profile.email}`}>
                 {profile.email}
               </a>
             </li>
             <li>
-              <span className="font-fell block text-[0.95rem] text-ink-soft">LinkedIn</span>
+              <span className="font-label block text-[0.95rem] text-ink-soft">LinkedIn</span>
               <a className="link-seal" href={profile.linkedin.href} target="_blank" rel="noopener noreferrer">
                 {profile.linkedin.label}
               </a>

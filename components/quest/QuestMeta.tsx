@@ -4,7 +4,7 @@ import type { Quest } from "@/lib/content";
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="py-3">
-      <dt className="font-fell text-[0.98rem] text-ink-soft">{label}</dt>
+      <dt className="font-label text-[0.98rem] text-ink-soft">{label}</dt>
       <dd className="mt-0.5 text-[1rem] leading-snug">{children}</dd>
     </div>
   );
@@ -13,7 +13,7 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 export function QuestMeta({ quest }: { quest: Quest }) {
   return (
     <div className="border-[1.5px] border-ink bg-paper-deep px-5 pt-4 pb-5 shadow-[inset_0_0_0_3px_var(--paper-deep),inset_0_0_0_4px_var(--ink)]">
-      <h2 className="font-fell text-[1.3rem]">Quest details</h2>
+      <h2 className="font-label text-[1.3rem]">Quest details</h2>
       <dl className="mt-1 divide-y divide-ink/15">
         <Row label="Quest giver">{quest.giver}</Row>
         {quest.party && <Row label="Party">{quest.party}</Row>}

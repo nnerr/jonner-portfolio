@@ -1,7 +1,7 @@
 // How SmishX judges a link, drawn as a numbered ink diagram. The steps come
 // straight from the thesis (chapter 1.3 to 1.7).
 
-const fell = { fontFamily: "var(--font-fell), Georgia, serif" };
+const labelText = { fontFamily: "var(--font-jost), sans-serif", fontWeight: 500 };
 
 function StackDiagram() {
   return (
@@ -26,12 +26,12 @@ function StackDiagram() {
         <path d="M134 83C166 83 166 58 192 58" />
         <path d="M348 54H412" />
       </g>
-      <g fontSize={16} textAnchor="middle" fill="var(--ink)" style={fell}>
+      <g fontSize={16} textAnchor="middle" fill="var(--ink)" style={labelText}>
         <text x={68} y={30}>Random Forest</text>
         <text x={68} y={88}>XGBoost</text>
         <text x={271} y={59}>Logistic Regression</text>
       </g>
-      <text x={382} y={44} fontSize={14} textAnchor="middle" fill="var(--seal)" style={fell}>
+      <text x={382} y={44} fontSize={14} textAnchor="middle" fill="var(--seal)" style={labelText}>
         verdict
       </text>
     </svg>
@@ -68,7 +68,7 @@ export function SmishxPipeline() {
       <ol className="pipeline">
         {steps.map((step) => (
           <li key={step.title}>
-            <p className="font-fell text-[1.15rem] leading-tight">{step.title}</p>
+            <p className="font-label text-[1.15rem] leading-tight">{step.title}</p>
             <p className="mt-1 text-[1rem] leading-relaxed text-ink-soft">{step.body}</p>
             {step.diagram && <StackDiagram />}
           </li>

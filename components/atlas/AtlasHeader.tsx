@@ -2,9 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { profile } from "@/lib/content";
 
+// The name card floating over the top-left of the map.
 export function AtlasHeader() {
   return (
-    <div className="flex min-w-0 items-center gap-4">
+    <div className="hud-card hud-id">
       <Link href="/character" className="portrait portrait--link" aria-label="Open the character sheet">
         <Image
           src={profile.photo}
@@ -16,15 +17,12 @@ export function AtlasHeader() {
         />
       </Link>
       <div className="min-w-0">
-        <h1 className="font-display text-[1.85rem] leading-[1.02] font-semibold tracking-[-0.015em] sm:text-[2.15rem]">
-          {profile.name}
-        </h1>
-        <p className="font-fell mt-1 text-[1.08rem] text-ink-soft">
-          {profile.role} · {profile.home}
+        <h1 className="hud-id__name font-display font-semibold tracking-[-0.015em]">{profile.name}</h1>
+        <p className="hud-id__role font-label text-ink-soft">
+          {profile.role}
+          <span className="hidden sm:inline"> · {profile.home}</span>
         </p>
-        <p className="mt-1.5 max-w-[50ch] text-[0.95rem] leading-snug lg:hidden xl:block">
-          {profile.intro}
-        </p>
+        <p className="hud-id__intro">{profile.intro}</p>
       </div>
     </div>
   );

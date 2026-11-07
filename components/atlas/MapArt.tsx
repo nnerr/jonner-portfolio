@@ -1,4 +1,4 @@
-import { MAP_HEIGHT, MAP_WIDTH, places, uncharted } from "@/lib/content";
+import { MAP_VIEW, places, uncharted } from "@/lib/content";
 import {
   along,
   blob,
@@ -18,8 +18,7 @@ import {
 // globals.css). Each animated element sits in its own group without a
 // transform attribute, because a CSS transform would replace it.
 
-const W = MAP_WIDTH;
-const H = MAP_HEIGHT;
+const V = MAP_VIEW;
 
 const INK = "var(--ink)";
 const INK_SOFT = "var(--ink-soft)";
@@ -32,9 +31,13 @@ const SEAL = "var(--seal)";
 const FOREST = "#c4bd93";
 const LAMP = "#e2b85a";
 
-const fell = { fontFamily: "var(--font-fell), Georgia, serif" };
-const display = { fontFamily: "var(--font-fraunces), Georgia, serif" };
-const body = { fontFamily: "var(--font-literata), Georgia, serif" };
+const labelText = {
+  fontFamily: "var(--font-jost), sans-serif",
+  fontWeight: 500,
+  textTransform: "uppercase" as const,
+  letterSpacing: "0.08em",
+};
+const body = { fontFamily: "var(--font-jost), sans-serif" };
 
 // --- Geography --------------------------------------------------------------
 
@@ -73,8 +76,8 @@ const LAND = [
   ),
 ].join("");
 
-// The sea stops at the inner border so the frame shows bare paper.
-const SEA_SHAPE = `M24 24H${W - 24}V${H - 24}H24Z${LAND}`;
+// Open sea fills the whole view; the land is cut out of it.
+const SEA_SHAPE = `M${V.x} ${V.y}h${V.w}v${V.h}h${-V.w}Z${LAND}`;
 
 const TRAIL: Pt[] = [
   at["feu-highlands"], [560, 318], [700, 272], at["guild-hall"], [965, 285],
@@ -122,6 +125,8 @@ const MARSH_TUFTS: Pt[] = [
 
 const WAVES: Pt[] = [
   [95, 330], [88, 690], [470, 82], [1000, 72], [1520, 380], [1180, 905], [1450, 892], [720, 950],
+  [-110, 180], [-130, 560], [-90, 930], [1690, 260], [1720, 620], [1660, 1010], [300, -50],
+  [1180, -60], [860, 1060], [1500, 1080],
 ];
 
 const WAYSTONES = [0.38, 0.55, 0.72].map((t) => along(WORKSHOP_ROAD, t));
@@ -424,7 +429,7 @@ function Compass({ x, y }: { x: number; y: number }) {
         </g>
       ))}
       <circle r={4} fill={PAPER} stroke={INK} strokeWidth={1} />
-      <text y={-68} textAnchor="middle" fontSize={22} fill={INK} style={fell}>
+      <text y={-68} textAnchor="middle" fontSize={22} fill={INK} style={labelText}>
         N
       </text>
     </g>
@@ -571,32 +576,6 @@ function Birds() {
   );
 }
 
-function Cartouche() {
-  return (
-    <g transform="translate(192 92)">
-      <rect x={-148} y={-50} width={296} height={100} fill={PAPER} stroke={INK} strokeWidth={1.6} />
-      <rect x={-142} y={-44} width={284} height={88} fill="none" stroke={INK} strokeWidth={0.8} />
-      {[
-        [-142, -44],
-        [142, -44],
-        [-142, 44],
-        [142, 44],
-      ].map(([cx, cy]) => (
-        <path key={`${cx}${cy}`} d={`M${cx} ${cy - 5}l5 5l-5 5l-5 -5z`} fill={INK} />
-      ))}
-      <text y={-18} textAnchor="middle" fontSize={16} letterSpacing={2} fill={INK_SOFT} style={fell}>
-        Atlas of
-      </text>
-      <text y={12} textAnchor="middle" fontSize={27} fontWeight={500} fill={INK} style={display}>
-        Jonner D. Villapando
-      </text>
-      <text y={34} textAnchor="middle" fontSize={13.5} fontStyle="italic" fill={INK_SOFT} style={body}>
-        Manila · surveyed 2021 to 2026
-      </text>
-    </g>
-  );
-}
-
 function ScaleBar({ x, y }: { x: number; y: number }) {
   const seg = 44;
   return (
@@ -613,7 +592,7 @@ function ScaleBar({ x, y }: { x: number; y: number }) {
           strokeWidth={1}
         />
       ))}
-      <text x={seg * 2} y={26} textAnchor="middle" fontSize={13} fill={INK_SOFT} style={fell}>
+      <text x={seg * 2} y={26} textAnchor="middle" fontSize={11} fill={INK_SOFT} style={labelText}>
         Leagues · one league, one semester
       </text>
     </g>
@@ -629,7 +608,8 @@ export function MapArt() {
 
   return (
     <svg
-      viewBox={`0 0 ${W} ${H}`}
+      viewBox={`${V.x} ${V.y} ${V.w} ${V.h}`}
+      preserveAspectRatio="xMidYMid slice"
       role="img"
       aria-label="A hand-drawn map of Jonner's journey, from FEU Highlands to the Wayfarer's Inn."
     >
@@ -643,7 +623,7 @@ export function MapArt() {
         <pattern id="sea-lines" width={28} height={14} patternUnits="userSpaceOnUse">
           <path d="M0 7q7 -3.5 14 0t14 0" fill="none" stroke={INK} strokeWidth={0.8} opacity={0.1} />
         </pattern>
-        <mask id="trail-mask" maskUnits="userSpaceOnUse" x={0} y={0} width={W} height={H}>
+        <mask id="trail-mask" maskUnits="userSpaceOnUse" x={V.x} y={V.y} width={V.w} height={V.h}>
           <path
             className="trail-reveal"
             d={trail}
@@ -826,21 +806,7 @@ export function MapArt() {
         Sea of Merge Requests
       </text>
       <ScaleBar x={1340} y={924} />
-      <Cartouche />
 
-      {/* Neatline: a chequered border band between two rules. */}
-      <rect
-        x={18}
-        y={18}
-        width={W - 36}
-        height={H - 36}
-        fill="none"
-        stroke={INK}
-        strokeWidth={11}
-        strokeDasharray="40 40"
-      />
-      <rect x={12} y={12} width={W - 24} height={H - 24} fill="none" stroke={INK} strokeWidth={2} />
-      <rect x={24} y={24} width={W - 48} height={H - 48} fill="none" stroke={INK} strokeWidth={1.2} />
     </svg>
   );
 }

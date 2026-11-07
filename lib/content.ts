@@ -510,8 +510,18 @@ export const uncharted = [
   { x: 175, y: 860, label: "Uncharted" },
 ];
 
-export const MAP_WIDTH = 1600;
-export const MAP_HEIGHT = 1000;
+// The map's coordinate window. The island lives in 0-1600 by 0-1000; the
+// extra margin is open sea, so when the map is cropped to fill a screen only
+// water is lost. Keep the 16:10 shape.
+export const MAP_VIEW = { x: -200, y: -125, w: 2000, h: 1250 };
+
+/** A map coordinate as a percentage position inside the map sheet. */
+export function mapPercent(x: number, y: number) {
+  return {
+    left: `${((x - MAP_VIEW.x) / MAP_VIEW.w) * 100}%`,
+    top: `${((y - MAP_VIEW.y) / MAP_VIEW.h) * 100}%`,
+  };
+}
 
 export function getPlace(slug: string) {
   return places.find((place) => place.slug === slug);

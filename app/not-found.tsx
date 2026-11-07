@@ -13,11 +13,11 @@ export default function NotFound() {
           <path d="M0 0L0 58L-9 0Z" fill="var(--paper)" stroke="var(--ink)" />
         </g>
         <circle r={4} fill="var(--paper)" stroke="var(--ink)" />
-        <text y={-62} textAnchor="middle" fontSize={16} fill="var(--ink)" style={{ fontFamily: "var(--font-fell)" }}>
+        <text y={-62} textAnchor="middle" fontSize={16} fill="var(--ink)" style={{ fontFamily: "var(--font-jost)", fontWeight: 500 }}>
           N
         </text>
       </svg>
-      <p className="font-fell mt-6 text-[1.15rem] text-seal">Here be dragons</p>
+      <p className="font-label mt-6 text-[1.15rem] text-seal">Here be dragons</p>
       <h1 className="font-display mt-2 text-[2.6rem] leading-[1.05] font-semibold tracking-[-0.02em] sm:text-[3.2rem]">
         You&rsquo;ve wandered off the map
       </h1>
